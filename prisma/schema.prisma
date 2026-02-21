@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model User {
+  id        String                 @id @default(uuid())
+  clerkId   String                 @unique
+  email     String                 @unique
+  name      String
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  orders    Order[]
+  cart      Cart?
+  downloads DownloadVerification[]
+}
+
+model ProductCategory {
+  id       String    @id @default(uuid())
+  title    String
+  products Product[]
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  priceInCents Int      @default(0)
+  imageUrl     String
+  fileUrl      String
+  isAvailable  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Foreign Key
+  categoryId            String
+  category              ProductCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  cartItems             CartItem[]
+  downloadVerifications DownloadVerification[]
+}
+
+model Cart {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // One To Many
+  items CartItem[]
+
+  // One to One
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  status            OrderStatus @default(PENDING)
+  totalPriceInCents Int         @default(0)
+  stripeSessionId   String?     @unique
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  items                 OrderItem[]
+  userId                String
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  downloadVerifications DownloadVerification[]
+}
+
+model OrderItem {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  priceInCents Int      @default(0)
+  imageUrl     String
+  fileUrl      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model DownloadVerification {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
