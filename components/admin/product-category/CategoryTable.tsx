@@ -1,0 +1,93 @@
+import { ProductCategory } from '@/types';
+import { Library, MoreHorizontalIcon } from 'lucide-react';
+import EmptyStorage from '../EmptyStorage';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import CategoryDelete from './CategoryDelete';
+
+interface CategoryTableProps {
+  productCategories: ProductCategory[];
+}
+
+export default function CategoryTable({
+  productCategories,
+}: CategoryTableProps) {
+  return (
+    <>
+      {/* Category Table */}
+      {productCategories.length > 0 && (
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-stone-900 border-gray-600">
+              <TableHead className="text-white">No</TableHead>
+              <TableHead className="text-white">Title</TableHead>
+              <TableHead className="text-white">Created At</TableHead>
+              <TableHead className="text-white">Updated At</TableHead>
+              <TableHead className="text-right text-white">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {productCategories.map((category, index) => (
+              <TableRow
+                key={category.id}
+                className="border-gray-600 hover:bg-stone-900"
+              >
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{category.title}</TableCell>
+                <TableCell>
+                  {category.createdAt.toLocaleString('en-En')}
+                </TableCell>
+                <TableCell>
+                  {category.updatedAt.toLocaleString('en-En')}
+                </TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="size-8">
+                        <MoreHorizontalIcon />
+                        <span className="sr-only">Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/admin/product-categories/${category.id}`}>
+                          Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem variant="destructive" asChild>
+                        <CategoryDelete category={category} />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+      {productCategories.length === 0 && (
+        <EmptyStorage
+          title="roduct Category Storage Empty"
+          description="Create your product category here."
+          content="Create Product Category"
+          linkAction="/admin/product-categories/new"
+          iconEl={<Library />}
+        />
+      )}
+    </>
+  );
+}

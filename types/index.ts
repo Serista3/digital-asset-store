@@ -1,3 +1,11 @@
+import z from 'zod';
+
+export type ActionState = {
+  errors?: z.core.$ZodIssue[] | undefined;
+  message?: string;
+  success?: boolean;
+};
+
 export interface Product {
   id: string;
   title: string;

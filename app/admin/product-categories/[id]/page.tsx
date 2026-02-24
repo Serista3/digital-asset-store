@@ -1,3 +1,52 @@
-export default function EditProductCategory() {
-  return <div>Edit Product Category</div>;
+import { getProductCategory, updateProductCategory } from '@/action/category';
+import AlertDestructive from '@/components/admin/AlertDestructive';
+import ProductCategoryForm from '@/components/admin/product-category/CategoryForm';
+import Heading from '@/components/typography/Heading';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+
+export default async function EditProductCategory({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = await params;
+  const productCategory = await getProductCategory(id);
+  const updateActionWithId = updateProductCategory.bind(null, id)
+
+  return (
+    <section className="flex flex-col gap-12">
+      <div className="flex flex-col gap-4">
+        <Heading>Edit Product Category</Heading>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href="/admin/product-categories"
+                className="hover:text-white"
+              >
+                Product Categories
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">Edit</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      {productCategory && 'title' in productCategory && (
+        <ProductCategoryForm formData={productCategory} serverAction={updateActionWithId} />
+      )}
+      {productCategory && 'cause' in productCategory && (
+        <AlertDestructive error={productCategory} />
+      )}
+    </section>
+  );
 }
