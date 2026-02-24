@@ -6,7 +6,7 @@ import WebLogo from './WebLogo';
 
 export default async function MainNavigation() {
   return (
-    <nav className="w-full py-6 border border-gray-300">
+    <nav className="w-full py-6 border-b border-gray-300">
       <div className="max-w-275 mx-auto px-4 flex items-center gap-3 justify-between">
         {/* Logo */}
         <WebLogo />

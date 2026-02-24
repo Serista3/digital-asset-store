@@ -1,3 +1,5 @@
+import Heading from '@/components/typography/Heading';
+
 export default function newProductCategory() {
-  return <div>New Product Category</div>;
+  return <Heading>New Product Category</Heading>;
 }
