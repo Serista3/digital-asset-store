@@ -3,7 +3,7 @@
 import db from '@/lib/db';
 import { Product } from '@/types';
 
-// Get All Product
+// Fetch Products
 export const getProducts = async function (): Promise<Product[] | Error> {
   try {
     const products = await db.product.findMany({
@@ -18,7 +18,7 @@ export const getProducts = async function (): Promise<Product[] | Error> {
   }
 };
 
-// Get Product Detail
+// Fetch Product Detail
 export const getProduct = async function (
   id: string,
 ): Promise<Product | null | Error> {

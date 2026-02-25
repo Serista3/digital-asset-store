@@ -2,21 +2,25 @@
 
 import db from '@/lib/db';
 import { ProductCategorySchema, validateFormData } from '@/lib/validations';
-import { ActionState, ProductCategory } from '@/types';
+import { ActionState, ProductCategory, ResultItems } from '@/types';
+
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// Get All Product Category
+// Fetch Product Categories
 export const getProductCategories = async function (
   search?: string,
-  currentPage: string = '1',
-): Promise<{ data: ProductCategory[]; totalPages: number } | Error> {
+  currentPage: number = 1,
+): Promise<ResultItems<ProductCategory>> {
+  // Prepare Data
   const searchTerm = search?.trim().toLocaleLowerCase() || '';
   const limit = 10;
-  const skip = (Number(currentPage) - 1) * limit;
+  const skip = (currentPage - 1) * limit;
 
+  // Fetch data from database by search & page
   try {
     const [data, totalItems] = await db.$transaction([
+      // Filter search & page
       db.productCategory.findMany({
         where: {
           title: {
@@ -31,6 +35,7 @@ export const getProductCategories = async function (
         skip: skip,
       }),
 
+      // Count category
       db.productCategory.count({
         where: {
           title: {
@@ -52,7 +57,7 @@ export const getProductCategories = async function (
   }
 };
 
-// Get Product Category Detail
+// Fetch Product Category Detail
 export const getProductCategory = async function (
   id: string,
 ): Promise<ProductCategory | null | Error> {

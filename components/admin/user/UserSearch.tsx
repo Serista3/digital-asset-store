@@ -9,7 +9,7 @@ import {
 import { useSearch } from '@/hooks/useSearch';
 import { SearchIcon } from 'lucide-react';
 
-export default function CategorySearch() {
+export default function UserSearch() {
   const { value, setValue } = useSearch();
 
   return (
@@ -17,7 +17,7 @@ export default function CategorySearch() {
       <InputGroup>
         <InputGroupInput
           id="inline-start-input"
-          placeholder="Search title..."
+          placeholder="Search name..."
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />

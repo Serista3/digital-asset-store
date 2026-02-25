@@ -6,6 +6,25 @@ export type ActionState = {
   success?: boolean;
 };
 
+export type ResultItems<T> =
+  | {
+      data: T[];
+      totalPages: number;
+    }
+  | Error;
+
+export interface User {
+  id: string;
+  clerkId: string;
+  email: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  orders?: Order[];
+  cart?: Cart;
+  downloads?: DownloadVerification[];
+}
+
 export interface Product {
   id: string;
   title: string;
@@ -30,6 +49,10 @@ export interface ProductCategory {
   products?: Product[];
 }
 
+export interface Cart {}
+
 export interface CartItem {}
+
+export interface Order {}
 
 export interface DownloadVerification {}
