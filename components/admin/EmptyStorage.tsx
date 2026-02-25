@@ -25,7 +25,7 @@ export default function EmptyStorage({
   iconEl,
 }: EmptyStorageProps) {
   return (
-    <Empty className="border border-dashed border-gray-600">
+    <Empty className="border border-dashed">
       <EmptyHeader>
         <EmptyMedia variant="icon">{iconEl}</EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>
@@ -33,7 +33,7 @@ export default function EmptyStorage({
       </EmptyHeader>
       {linkAction && (
         <EmptyContent>
-          <Button variant="outline" size="sm" className="text-black">
+          <Button size="sm">
             <Link href={linkAction}>{content}</Link>
           </Button>
         </EmptyContent>

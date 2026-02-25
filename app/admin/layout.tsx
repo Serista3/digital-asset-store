@@ -16,8 +16,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${inter.className} antialiased bg-black text-white`}>
+      <html lang="en" className="dark">
+        <body className={`${inter.className} antialiased`}>
           <AdminNavigation />
           <main className="min-h-screen max-w-275 mx-auto px-4 pt-10 pb-15">
             {children}

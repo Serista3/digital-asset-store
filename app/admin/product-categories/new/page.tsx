@@ -1,4 +1,4 @@
-import ProductCategoryForm from '@/components/admin/product-category/CategoryForm';
+import ProductCategoryForm from '@/components/admin/category/CategoryForm';
 import Heading from '@/components/typography/Heading';
 import {
   Breadcrumb,
@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { createProductCategory } from '@/action/category';
+import Link from 'next/link';
 
 export default function newProductCategory() {
   return (
@@ -18,16 +19,13 @@ export default function newProductCategory() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink
-                href="/admin/product-categories"
-                className="hover:text-white"
-              >
-                Product Categories
+              <BreadcrumbLink asChild>
+                <Link href="/admin/product-categories">Product Categories</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">New</BreadcrumbPage>
+              <BreadcrumbPage>New</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

@@ -5,20 +5,48 @@ import { ProductCategorySchema, validateFormData } from '@/lib/validations';
 import { ActionState, ProductCategory } from '@/types';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { success } from 'zod';
 
 // Get All Product Category
-export const getProductCategories = async function (): Promise<
-  ProductCategory[] | Error
-> {
-  try {
-    const productCategories = await db.productCategory.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+export const getProductCategories = async function (
+  search?: string,
+  currentPage: string = '1',
+): Promise<{ data: ProductCategory[]; totalPages: number } | Error> {
+  const searchTerm = search?.trim().toLocaleLowerCase() || '';
+  const limit = 10;
+  const skip = (Number(currentPage) - 1) * limit;
 
-    return productCategories;
+  try {
+    const [data, totalItems] = await db.$transaction([
+      db.productCategory.findMany({
+        where: {
+          title: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        skip: skip,
+      }),
+
+      db.productCategory.count({
+        where: {
+          title: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      data,
+      totalPages,
+    };
   } catch (err) {
     return err as Error;
   }

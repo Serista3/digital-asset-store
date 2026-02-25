@@ -7,7 +7,7 @@ interface AlertDestructiveProps {
 
 export default function AlertDestructive({ error }: AlertDestructiveProps) {
   return (
-    <Alert variant="destructive" className="w-fit bg-black border-gray-600">
+    <Alert variant="destructive" className="w-fit">
       <AlertCircleIcon />
       <AlertTitle>{error.name}</AlertTitle>
       <AlertDescription>{error.message}</AlertDescription>

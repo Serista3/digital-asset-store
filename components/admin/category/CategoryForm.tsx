@@ -33,7 +33,6 @@ export default function CategoryForm({
           name="title"
           type="text"
           placeholder="Type word..."
-          className="border-gray-600"
           defaultValue={formData?.title || ''}
           required
           disabled={isPending}

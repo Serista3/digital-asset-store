@@ -1,6 +1,6 @@
 import { getProductCategory, updateProductCategory } from '@/action/category';
 import AlertDestructive from '@/components/admin/AlertDestructive';
-import ProductCategoryForm from '@/components/admin/product-category/CategoryForm';
+import ProductCategoryForm from '@/components/admin/category/CategoryForm';
 import Heading from '@/components/typography/Heading';
 import {
   Breadcrumb,
@@ -10,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import Link from 'next/link';
 
 export default async function EditProductCategory({
   params,
@@ -18,7 +19,7 @@ export default async function EditProductCategory({
 }) {
   const { id } = await params;
   const productCategory = await getProductCategory(id);
-  const updateActionWithId = updateProductCategory.bind(null, id)
+  const updateActionWithId = updateProductCategory.bind(null, id);
 
   return (
     <section className="flex flex-col gap-12">
@@ -27,22 +28,22 @@ export default async function EditProductCategory({
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink
-                href="/admin/product-categories"
-                className="hover:text-white"
-              >
-                Product Categories
+              <BreadcrumbLink asChild>
+                <Link href="/admin/product-categories">Product Categories</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Edit</BreadcrumbPage>
+              <BreadcrumbPage>Edit</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
       {productCategory && 'title' in productCategory && (
-        <ProductCategoryForm formData={productCategory} serverAction={updateActionWithId} />
+        <ProductCategoryForm
+          formData={productCategory}
+          serverAction={updateActionWithId}
+        />
       )}
       {productCategory && 'cause' in productCategory && (
         <AlertDestructive error={productCategory} />

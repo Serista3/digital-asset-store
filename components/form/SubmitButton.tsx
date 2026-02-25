@@ -18,8 +18,7 @@ export default function SubmitButton({
   return (
     <Button
       type="submit"
-      className={cn('mt-6 text-black', className)}
-      variant="outline"
+      className={cn('mt-6', className)}
       disabled={pending}
     >
       {pending ? (

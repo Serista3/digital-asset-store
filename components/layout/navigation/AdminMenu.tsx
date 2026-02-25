@@ -34,16 +34,11 @@ export default async function AdminMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Admin Menu"
-          className="rounded-full border border-gray-800 hover:bg-gray-800 hover:text-white"
-        >
+        <Button variant='outline' size="icon" aria-label="Admin Menu">
           <TextAlignEnd className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-black text-white border-gray-600">
+      <DropdownMenuContent>
         <DropdownMenuGroup>
           <SignedIn>
             <DropdownMenuLabel className="flex gap-1.5 items-center">
@@ -58,7 +53,7 @@ export default async function AdminMenu() {
               </div>
               {user?.firstName || 'User'}
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-gray-600" />
+            <DropdownMenuSeparator />
             {sessionClaims?.metadata.role === 'admin' && (
               <DropdownMenuItem asChild>
                 <Link href="/admin" className="flex gap-1.5 items-center">
@@ -97,8 +92,8 @@ export default async function AdminMenu() {
                 User
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-gray-600" />
-            <Button className="w-full text-black" asChild variant="outline">
+            <DropdownMenuSeparator />
+            <Button className="w-full" variant='destructive' asChild>
               <SignOutButton>Logout</SignOutButton>
             </Button>
           </SignedIn>

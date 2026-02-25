@@ -32,20 +32,17 @@ export default function CategoryTable({
       {productCategories.length > 0 && (
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-stone-900 border-gray-600">
-              <TableHead className="text-white">No</TableHead>
-              <TableHead className="text-white">Title</TableHead>
-              <TableHead className="text-white">Created At</TableHead>
-              <TableHead className="text-white">Updated At</TableHead>
-              <TableHead className="text-right text-white">Actions</TableHead>
+            <TableRow>
+              <TableHead>No</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead>Updated At</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {productCategories.map((category, index) => (
-              <TableRow
-                key={category.id}
-                className="border-gray-600 hover:bg-stone-900"
-              >
+              <TableRow key={category.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{category.title}</TableCell>
                 <TableCell>
@@ -81,7 +78,7 @@ export default function CategoryTable({
       )}
       {productCategories.length === 0 && (
         <EmptyStorage
-          title="roduct Category Storage Empty"
+          title="Product Category Storage Empty"
           description="Create your product category here."
           content="Create Product Category"
           linkAction="/admin/product-categories/new"

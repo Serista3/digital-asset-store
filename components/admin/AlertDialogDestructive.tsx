@@ -30,16 +30,13 @@ export function AlertDialogDestructive({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           className="w-full text-red-500 hover:text-red-600 border-none justify-start px-2 py-1.5"
         >
           {btnText}
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent
-        size="sm"
-        className="bg-black text-white border-gray-700 "
-      >
+      <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
             <Trash2Icon />
@@ -48,12 +45,7 @@ export function AlertDialogDestructive({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel
-            variant="ghost"
-            className="text-white border-gray-700 border hover:bg-stone-900 hover:text-white"
-          >
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={onDelete}>
             Delete
           </AlertDialogAction>
