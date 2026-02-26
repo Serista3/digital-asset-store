@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/lib/db';
-import { ProductCategorySchema, validateFormData } from '@/lib/validations';
+import { productCategorySchema, validateFormData } from '@/lib/validations';
 import { ActionState, ProductCategory, ResultItems } from '@/types';
 
 import { revalidatePath } from 'next/cache';
@@ -76,14 +76,14 @@ export const getProductCategory = async function (
 
 // Create Product Category
 export const createProductCategory = async function (
-  state: ActionState,
+  state: ActionState<ProductCategory>,
   formData: FormData,
-): Promise<ActionState> {
+): Promise<ActionState<ProductCategory>> {
   let success: boolean;
 
   try {
     const title = formData.get('title');
-    const validation = validateFormData(ProductCategorySchema, { title });
+    const validation = validateFormData(productCategorySchema, { title });
 
     // Validation
     if (!validation.success)
@@ -112,14 +112,14 @@ export const createProductCategory = async function (
 // Update Product Category
 export const updateProductCategory = async function (
   id: string,
-  state: ActionState,
+  state: ActionState<ProductCategory>,
   formData: FormData,
-): Promise<ActionState> {
+): Promise<ActionState<ProductCategory>> {
   let success: boolean;
 
   try {
     const title = formData.get('title');
-    const validation = validateFormData(ProductCategorySchema, { title });
+    const validation = validateFormData(productCategorySchema, { title });
 
     // Validation
     if (!validation.success)

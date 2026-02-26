@@ -33,7 +33,7 @@ export default function EmptyStorage({
       </EmptyHeader>
       {linkAction && (
         <EmptyContent>
-          <Button size="sm">
+          <Button size="sm" asChild>
             <Link href={linkAction}>{content}</Link>
           </Button>
         </EmptyContent>

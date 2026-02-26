@@ -1,21 +1,47 @@
-import Heading from '@/components/typography/Heading';
-
-import { getProducts } from '@/action/product';
 import ProductTable from '@/components/admin/product/ProductTable';
 import AlertDestructive from '@/components/admin/AlertDestructive';
+import ExplorerLayout from '@/components/layout/ExplorerLayout';
+import BasicPagination from '@/components/admin/BasicPagination';
+import ProductSearch from '@/components/admin/product/ProductSearch';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { getProducts } from '@/action/product';
+import Link from 'next/link';
 
-export default async function Products() {
-  const products = await getProducts();
+interface ProductsProps {
+  searchParams: Promise<{
+    search?: string;
+    page?: string;
+  }>;
+}
+
+export default async function Products({ searchParams }: ProductsProps) {
+  const { search, page } = await searchParams;
+  const products = await getProducts({ search, page: Number(page ?? 1) });
 
   return (
-    <section className="flex flex-col gap-12">
-      <Heading>Products</Heading>
-      {Array.isArray(products) && (
+    <ExplorerLayout title="Products">
+      {'data' in products && (
         <div>
-          <ProductTable products={products} />
+          {/* Product Action */}
+          <div className="flex gap-4 items-center justify-end mb-6">
+            <ProductSearch />
+            <Button asChild>
+              <Link href="/admin/products/new">
+                <Plus />
+                <span>New Product</span>
+              </Link>
+            </Button>
+          </div>
+
+          {/* Product Table */}
+          <ProductTable products={products.data} />
+
+          {/* Pagination */}
+          <BasicPagination totalPages={products.totalPages} />
         </div>
       )}
       {'cause' in products && <AlertDestructive error={products} />}
-    </section>
+    </ExplorerLayout>
   );
 }

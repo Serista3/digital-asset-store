@@ -10,9 +10,9 @@ import { useActionState } from 'react';
 interface CategoryFormProps {
   formData?: ProductCategory;
   serverAction: (
-    state: ActionState,
+    state: ActionState<ProductCategory>,
     formData: FormData,
-  ) => Promise<ActionState>;
+  ) => Promise<ActionState<ProductCategory>>;
 }
 
 export default function CategoryForm({

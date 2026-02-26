@@ -1,10 +1,11 @@
 import z from 'zod';
 
-export type ActionState = {
+export interface ActionState<T> {
   errors?: z.core.$ZodIssue[] | undefined;
   message?: string;
   success?: boolean;
-};
+  oldFormData?: T;
+}
 
 export type ResultItems<T> =
   | {
@@ -28,7 +29,7 @@ export interface User {
 export interface Product {
   id: string;
   title: string;
-  description: string | null;
+  description?: string | null;
   priceInCents: number;
   imageUrl: string;
   fileUrl: string;
