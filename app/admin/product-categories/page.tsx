@@ -3,31 +3,27 @@ import AlertDestructive from '@/components/admin/AlertDestructive';
 import ProductCategorySearch from '@/components/admin/category/CategorySearch';
 import BasicPagination from '@/components/admin/BasicPagination';
 import ExplorerLayout from '@/components/layout/ExplorerLayout';
-import { Button } from '@/components/ui/button';
 
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { getProductCategories } from '@/action/category';
+import { SearchParams } from '@/types';
 
 interface ProductCategoriesProps {
-  searchParams: Promise<{ search?: string; page?: string }>;
+  searchParams: Promise<SearchParams>;
 }
 
-export default async function ProductCategories({
-  searchParams,
-}: ProductCategoriesProps) {
+export default async function ProductCategories({ searchParams }: ProductCategoriesProps) {
   const { search, page } = await searchParams;
-  const productCategories = await getProductCategories(
-    search,
-    Number(page ?? 1),
-  );
+  const productCategories = await getProductCategories({ search, page: Number(page ?? 1)});
 
   return (
     <ExplorerLayout title="Product Categories">
       <>
         {'data' in productCategories && (
           <div>
-            {/* Action Button */}
+            {/* Call to action */}
             <div className="flex gap-4 items-center justify-end mb-6">
               <ProductCategorySearch />
               <Button asChild>
@@ -41,7 +37,7 @@ export default async function ProductCategories({
             {/* Category Table */}
             <ProductCategoryTable productCategories={productCategories.data} />
 
-            {/* Category Pagination */}
+            {/* Pagination */}
             <BasicPagination totalPages={productCategories.totalPages} />
           </div>
         )}

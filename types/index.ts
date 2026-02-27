@@ -14,6 +14,11 @@ export type ResultItems<T> =
     }
   | Error;
 
+export interface SearchParams {
+  search?: string
+  page?: number
+}
+
 export interface User {
   id: string;
   clerkId: string;

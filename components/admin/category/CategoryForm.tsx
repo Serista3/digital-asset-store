@@ -4,15 +4,16 @@ import FormError from '@/components/form/FormError';
 import SubmitButton from '@/components/form/SubmitButton';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { ProductCategoryFormData } from '@/lib/validations';
 import { ActionState, ProductCategory } from '@/types';
 import { useActionState } from 'react';
 
 interface CategoryFormProps {
   formData?: ProductCategory;
   serverAction: (
-    state: ActionState<ProductCategory>,
+    state: ActionState<ProductCategoryFormData>,
     formData: FormData,
-  ) => Promise<ActionState<ProductCategory>>;
+  ) => Promise<ActionState<ProductCategoryFormData>>;
 }
 
 export default function CategoryForm({
@@ -33,7 +34,7 @@ export default function CategoryForm({
           name="title"
           type="text"
           placeholder="Type word..."
-          defaultValue={formData?.title || ''}
+          defaultValue={formData?.title || state.oldFormData?.title || ''}
           required
           disabled={isPending}
         />

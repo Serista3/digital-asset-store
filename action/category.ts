@@ -1,52 +1,44 @@
-'use server';
+"use server";
 
-import db from '@/lib/db';
-import { productCategorySchema, validateFormData } from '@/lib/validations';
-import { ActionState, ProductCategory, ResultItems } from '@/types';
+import db from "@/lib/db";
+import { calTotalPages, prepareQueryInfo } from "@/lib/utils";
+import { ProductCategoryFormData, productCategorySchema, validateFormData } from "@/lib/validations";
+import { ActionState, ProductCategory, ResultItems, SearchParams } from "@/types";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { isAdminUser } from "./user";
 
 // Fetch Product Categories
-export const getProductCategories = async function (
-  search?: string,
-  currentPage: number = 1,
-): Promise<ResultItems<ProductCategory>> {
-  // Prepare Data
-  const searchTerm = search?.trim().toLocaleLowerCase() || '';
-  const limit = 10;
-  const skip = (currentPage - 1) * limit;
+export const getProductCategories = async function (searchParams: SearchParams): Promise<ResultItems<ProductCategory>> {
+  const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
 
-  // Fetch data from database by search & page
   try {
     const [data, totalItems] = await db.$transaction([
-      // Filter search & page
       db.productCategory.findMany({
         where: {
           title: {
             contains: searchTerm,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         take: limit,
-        skip: skip,
+        skip,
       }),
-
-      // Count category
       db.productCategory.count({
         where: {
           title: {
             contains: searchTerm,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
       }),
     ]);
 
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalPages = calTotalPages(totalItems);
 
     return {
       data,
@@ -58,9 +50,7 @@ export const getProductCategories = async function (
 };
 
 // Fetch Product Category Detail
-export const getProductCategory = async function (
-  id: string,
-): Promise<ProductCategory | null | Error> {
+export const getProductCategory = async function (id: string): Promise<ProductCategory | null | Error> {
   try {
     const productCategory = await db.productCategory.findFirst({
       where: {
@@ -76,18 +66,24 @@ export const getProductCategory = async function (
 
 // Create Product Category
 export const createProductCategory = async function (
-  state: ActionState<ProductCategory>,
+  state: ActionState<ProductCategoryFormData>,
   formData: FormData,
-): Promise<ActionState<ProductCategory>> {
+): Promise<ActionState<ProductCategoryFormData>> {
   let success: boolean;
 
   try {
-    const title = formData.get('title');
-    const validation = validateFormData(productCategorySchema, { title });
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    const title = formData.get("title");
+    const oldFormData = {
+      title: String(formData.get("title") || '')
+    }
 
     // Validation
+    const validation = validateFormData(productCategorySchema, { title });
+
     if (!validation.success)
-      return { errors: validation.errors, success: false };
+      return { errors: validation.errors, success: false, oldFormData };
 
     // Save in DB
     await db.productCategory.create({
@@ -99,31 +95,37 @@ export const createProductCategory = async function (
     success = true;
   } catch (err) {
     return {
-      message: (err as Error).message || 'Some thing went wrong',
+      message: (err as Error).message || "Some thing went wrong",
       success: false,
     };
   }
 
-  if (success) redirect('/admin/product-categories');
+  if (success) redirect("/admin/product-categories");
 
-  return { success: false, message: 'Unknown error occurred' };
+  return { success: false, message: "Unknown error occurred" };
 };
 
 // Update Product Category
 export const updateProductCategory = async function (
   id: string,
-  state: ActionState<ProductCategory>,
+  state: ActionState<ProductCategoryFormData>,
   formData: FormData,
-): Promise<ActionState<ProductCategory>> {
+): Promise<ActionState<ProductCategoryFormData>> {
   let success: boolean;
 
   try {
-    const title = formData.get('title');
-    const validation = validateFormData(productCategorySchema, { title });
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    const title = formData.get("title");
+    const oldFormData = {
+      title: String(formData.get("title") || '')
+    }
 
     // Validation
+    const validation = validateFormData(productCategorySchema, { title });
+    
     if (!validation.success)
-      return { errors: validation.errors, success: false };
+      return { errors: validation.errors, success: false, oldFormData };
 
     // Save in DB
     await db.productCategory.update({
@@ -138,19 +140,21 @@ export const updateProductCategory = async function (
     success = true;
   } catch (err) {
     return {
-      message: (err as Error).message || 'Some thing went wrong',
+      message: (err as Error).message || "Some thing went wrong",
       success: false,
     };
   }
 
-  if (success) redirect('/admin/product-categories');
+  if (success) redirect("/admin/product-categories");
 
-  return { success: false, message: 'Unknown error occurred' };
+  return { success: false, message: "Unknown error occurred" };
 };
 
 // Delete Product Category
 export const deleteProductCategory = async function (id: string) {
   try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
     await db.productCategory.delete({
       where: {
         id,
@@ -158,12 +162,12 @@ export const deleteProductCategory = async function (id: string) {
     });
 
     // Clear cache
-    revalidatePath('/admin/product-categories');
+    revalidatePath("/admin/product-categories");
 
-    return { success: true, message: 'Delete product category success!!' };
+    return { success: true, message: "Delete product category success!!" };
   } catch (err) {
     return {
-      message: (err as Error).message || 'Some thing went wrong',
+      message: (err as Error).message || "Some thing went wrong",
       success: false,
     };
   }

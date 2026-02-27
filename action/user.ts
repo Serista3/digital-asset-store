@@ -1,16 +1,19 @@
 'use server';
 
 import db from '@/lib/db';
-import { ResultItems, User } from '@/types';
+import { calTotalPages, prepareQueryInfo } from '@/lib/utils';
+import { ResultItems, SearchParams, User } from '@/types';
+import { auth } from '@clerk/nextjs/server';
+
+// Admin role
+export const isAdminUser = async function(){
+  const { isAuthenticated, sessionClaims } = await auth()
+  return isAuthenticated && sessionClaims.metadata.role === 'admin'
+}
 
 // Fetch Users
-export const getUsers = async function (
-  search?: string,
-  currentPage: number = 1,
-): Promise<ResultItems<User>> {
-  const searchTerm = search?.trim().toLocaleLowerCase() || '';
-  const limit = 10;
-  const skip = (currentPage - 1) * limit;
+export const getUsers = async function (searchParams: SearchParams): Promise<ResultItems<User>> {
+  const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
 
   try {
     const [users, totalUsers] = await db.$transaction([
@@ -22,7 +25,7 @@ export const getUsers = async function (
           },
         },
         take: limit,
-        skip: skip,
+        skip,
         orderBy: {
           createdAt: 'desc',
         },
@@ -38,7 +41,7 @@ export const getUsers = async function (
       }),
     ]);
 
-    const totalPages = Math.ceil(totalUsers / limit);
+    const totalPages = calTotalPages(totalUsers);
 
     return {
       data: users,

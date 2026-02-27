@@ -1,4 +1,5 @@
 import { getUsers } from '@/action/user';
+import { SearchParams } from '@/types';
 
 import AlertDestructive from '@/components/admin/AlertDestructive';
 import BasicPagination from '@/components/admin/BasicPagination';
@@ -7,15 +8,12 @@ import UserTable from '@/components/admin/user/UserTable';
 import ExplorerLayout from '@/components/layout/ExplorerLayout';
 
 interface UsersProps {
-  searchParams: Promise<{
-    search?: string;
-    page?: string;
-  }>;
+  searchParams: Promise<SearchParams>;
 }
 
 export default async function Users({ searchParams }: UsersProps) {
   const { search, page } = await searchParams;
-  const users = await getUsers(search, Number(page ?? 1));
+  const users = await getUsers({ search, page: Number(page ?? 1) });
 
   return (
     <ExplorerLayout title="Users">

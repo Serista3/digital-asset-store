@@ -30,6 +30,8 @@ export const productCategorySchema = z.object({
     .min(4, { message: 'Title length must be greater than 3.' }),
 });
 
+export type ProductCategoryFormData = z.infer<typeof productCategorySchema>;
+
 // Product Schema
 export const productSchema = z.object({
   title: z
