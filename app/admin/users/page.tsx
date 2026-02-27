@@ -26,7 +26,7 @@ export default async function Users({ searchParams }: UsersProps) {
             </div>
 
             {/* User Table */}
-            <UserTable users={users.data} />
+            <UserTable users={users.data} page={page} />
 
             {/* Pagination */}
             <BasicPagination totalPages={users.totalPages} />

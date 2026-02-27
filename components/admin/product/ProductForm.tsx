@@ -115,7 +115,7 @@ export default function ProductForm({
                 type="file"
                 name="imageUrl"
                 placeholder="Choose image for product..."
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 required={!formData}
                 disabled={isPending}
               />
@@ -127,7 +127,7 @@ export default function ProductForm({
                 type="file"
                 name="fileUrl"
                 placeholder="Choose file for product..."
-                accept=".pdf,.zip,image/*"
+                accept=".zip,.rar,.pdf,.epub,.psd,.ai,.fig,.svg,.xlsx,.pptx,.docx"
                 required={!formData}
                 disabled={isPending}
               />

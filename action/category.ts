@@ -27,6 +27,9 @@ export const getProductCategories = async function (searchParams: SearchParams):
         },
         take: limit,
         skip,
+        include: {
+          products: true
+        }
       }),
       db.productCategory.count({
         where: {

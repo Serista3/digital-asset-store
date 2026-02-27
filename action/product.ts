@@ -1,25 +1,20 @@
 'use server';
 
 import db from '@/lib/db';
-import { ActionState, Product, ResultItems } from '@/types';
-import { LIMIT_RESULT } from './constants';
+import { ActionState, Product, ResultItems, SearchParams } from '@/types';
 import {
   ProductFormData,
   productSchema,
   validateFormData,
 } from '@/lib/validations';
 import { redirect } from 'next/navigation';
+import { calTotalPages, prepareQueryInfo } from '@/lib/utils';
+import { isAdminUser } from './user';
+import { uploadProductDigitalFile, uploadProductImage } from '@/lib/supabase';
 
 // Fetch Products
-export const getProducts = async function ({
-  search = '',
-  page = 1,
-}: {
-  search?: string;
-  page?: number;
-}): Promise<ResultItems<Product>> {
-  const searchTerm = search.trim().toLocaleLowerCase();
-  const skip = (page - 1) * LIMIT_RESULT;
+export const getProducts = async function (searchParams: SearchParams): Promise<ResultItems<Product>> {
+  const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
 
   try {
     const [products, totalItems] = await db.$transaction([
@@ -31,10 +26,13 @@ export const getProducts = async function ({
           },
         },
         skip,
-        take: LIMIT_RESULT,
+        take: limit,
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          category: true
+        }
       }),
 
       db.product.count({
@@ -47,7 +45,7 @@ export const getProducts = async function ({
       }),
     ]);
 
-    const totalPages = Math.ceil(totalItems / LIMIT_RESULT);
+    const totalPages = calTotalPages(totalItems);
     return {
       data: products,
       totalPages,
@@ -58,9 +56,7 @@ export const getProducts = async function ({
 };
 
 // Fetch Product Detail
-export const getProduct = async function (
-  id: string,
-): Promise<Product | null | Error> {
+export const getProduct = async function (id: string,): Promise<Product | null | Error> {
   try {
     const product = await db.product.findFirst({
       where: {
@@ -82,6 +78,8 @@ export const createProduct = async function (
   let success: boolean;
 
   try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
     const data = Object.fromEntries(formData.entries());
     const priceInCents = Number(formData.get('priceInCents'));
     const isAvailable = formData.get('isAvailable') === 'on' ? true : false;
@@ -110,13 +108,25 @@ export const createProduct = async function (
         success: false,
         oldFormData: oldFormData,
       };
-
+    
+    // uploade file to bucket storage
+    const [productImageUrl, productDigitalFile] = await Promise.all([
+      uploadProductImage(validation.data!.imageUrl),
+      uploadProductDigitalFile(validation.data!.fileUrl)
+    ]);
+    
     // Save in DB
-    // await db.productCategory.create({-
-    //   data: {
-    //     title: validation.data?.title as string,
-    //   },
-    // });
+    await db.product.create({
+      data: {
+        title: validation.data?.title ?? '',
+        description: validation.data?.description ?? '',
+        priceInCents: Math.round((validation.data?.priceInCents ?? 10) * 100) ,
+        imageUrl: productImageUrl,
+        fileUrl: productDigitalFile,
+        isAvailable: validation.data?.isAvailable ?? false,
+        categoryId: validation.data?.categoryId ?? ''
+      },
+    });
 
     success = true;
   } catch (err) {

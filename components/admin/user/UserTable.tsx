@@ -10,8 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { LIMIT_RESULT } from '@/action/constants';
+import { formattedDateToRead } from '@/lib/utils';
 
-export default async function UserTable({ users }: { users: User[] }) {
+export default async function UserTable({ users, page = 1 }: { users: User[], page?: number }) {
   return (
     <>
       {/* User Table */}
@@ -29,11 +31,11 @@ export default async function UserTable({ users }: { users: User[] }) {
           <TableBody>
             {users.map((user, index) => (
               <TableRow key={user.id}>
-                <TableCell>{index + 1}</TableCell>
+                <TableCell>{(page - 1) * LIMIT_RESULT + index + 1}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.name}</TableCell>
-                <TableCell>{user.createdAt.toLocaleString('en-En')}</TableCell>
-                <TableCell>{user.updatedAt.toLocaleString('en-En')}</TableCell>
+                <TableCell>{formattedDateToRead(user.createdAt)}</TableCell>
+                <TableCell>{formattedDateToRead(user.updatedAt)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

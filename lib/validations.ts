@@ -44,6 +44,7 @@ export const productSchema = z.object({
     .trim()
     .max(200, 'Description length must be less than equal to 200.'),
   priceInCents: z
+    .coerce
     .number('Type price must be Int.')
     .positive('Price must greater than 0.')
     .gte(10, 'Price must greater than equal to 10')
@@ -58,15 +59,25 @@ export const productSchema = z.object({
     .min(1_240, 'File size minimun must greater than 1KB.') // 1KB
     .max(52_428_800, 'File size minimun must less than 50MB.') // 50MB
     .mime([
-      'application/pdf',
       'application/zip',
-      'application/javascript',
-      'application/json',
-      'application/msword',
-      'application/vnd.ms-excel',
-      'application/vnd.ms-powerpoint',
+      'application/x-zip-compressed',
+      'application/vnd.rar',
+      'application/x-rar-compressed',
+
+      'application/pdf',
+      'application/epub+zip',
+
+      'image/vnd.adobe.photoshop',
+      'application/x-photoshop',
+      'application/postscript',
+      'image/svg+xml',
+      'application/octet-stream',
+
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     ]),
-  isAvailable: z.boolean('Type isAvailable must be Boolean.'),
+  isAvailable: z.coerce.boolean('Type isAvailable must be Boolean.'),
   categoryId: z.uuid('Type categoryId must be UUID.'),
 });
 

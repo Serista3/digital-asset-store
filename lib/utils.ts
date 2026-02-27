@@ -22,3 +22,19 @@ export const prepareQueryInfo = function({ search = '', page = 1 }: SearchParams
 export const calTotalPages = function(totalItems: number){
   return Math.ceil(totalItems / LIMIT_RESULT)
 }
+
+// Fomatted Date
+export const formattedDateToRead = function(date: Date){
+  return (
+    date.toLocaleString("en-En", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  );
+}
+
+// Formatted Price
+export const formattedPrice = function(price: number){
+  return (price / 100).toFixed(2) + ' USD'
+}

@@ -4,15 +4,14 @@ import ExplorerLayout from '@/components/layout/ExplorerLayout';
 import BasicPagination from '@/components/admin/BasicPagination';
 import ProductSearch from '@/components/admin/product/ProductSearch';
 import { Button } from '@/components/ui/button';
+
+import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { getProducts } from '@/action/product';
-import Link from 'next/link';
+import { SearchParams } from '@/types';
 
 interface ProductsProps {
-  searchParams: Promise<{
-    search?: string;
-    page?: string;
-  }>;
+  searchParams: Promise<SearchParams>;
 }
 
 export default async function Products({ searchParams }: ProductsProps) {
@@ -23,7 +22,7 @@ export default async function Products({ searchParams }: ProductsProps) {
     <ExplorerLayout title="Products">
       {'data' in products && (
         <div>
-          {/* Product Action */}
+          {/* Call to action */}
           <div className="flex gap-4 items-center justify-end mb-6">
             <ProductSearch />
             <Button asChild>
@@ -35,7 +34,7 @@ export default async function Products({ searchParams }: ProductsProps) {
           </div>
 
           {/* Product Table */}
-          <ProductTable products={products.data} />
+          <ProductTable products={products.data} page={page} />
 
           {/* Pagination */}
           <BasicPagination totalPages={products.totalPages} />

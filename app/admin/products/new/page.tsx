@@ -7,14 +7,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { getProductCategories } from '@/action/category';
-import Link from 'next/link';
 import ProductForm from '@/components/admin/product/ProductForm';
 import AlertDestructive from '@/components/admin/AlertDestructive';
+
+import Link from 'next/link';
+import { getProductCategories } from '@/action/category';
 import { createProduct } from '@/action/product';
 
 export default async function NewProduct() {
-  const categories = await getProductCategories();
+  const categories = await getProductCategories({});
 
   return (
     <section className="flex flex-col gap-12">

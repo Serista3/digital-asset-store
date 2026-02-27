@@ -18,13 +18,17 @@ import {
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import CategoryDelete from './CategoryDelete';
+import { LIMIT_RESULT } from '@/action/constants';
+import { formattedDateToRead } from '@/lib/utils';
 
 interface CategoryTableProps {
   productCategories: ProductCategory[];
+  page?: number;
 }
 
 export default function CategoryTable({
   productCategories,
+  page = 1
 }: CategoryTableProps) {
   return (
     <>
@@ -35,6 +39,7 @@ export default function CategoryTable({
             <TableRow>
               <TableHead>No</TableHead>
               <TableHead>Title</TableHead>
+              <TableHead>Products</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead>Updated At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -43,13 +48,14 @@ export default function CategoryTable({
           <TableBody>
             {productCategories.map((category, index) => (
               <TableRow key={category.id}>
-                <TableCell>{index + 1}</TableCell>
+                <TableCell>{(page - 1) * LIMIT_RESULT + index + 1}</TableCell>
                 <TableCell>{category.title}</TableCell>
+                <TableCell>{category.products?.length || '-'}</TableCell>
                 <TableCell>
-                  {category.createdAt.toLocaleString('en-En')}
+                  {formattedDateToRead(category.createdAt)}
                 </TableCell>
                 <TableCell>
-                  {category.updatedAt.toLocaleString('en-En')}
+                  {formattedDateToRead(category.updatedAt)}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>

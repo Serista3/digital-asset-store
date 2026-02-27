@@ -35,7 +35,7 @@ export default async function ProductCategories({ searchParams }: ProductCategor
             </div>
 
             {/* Category Table */}
-            <ProductCategoryTable productCategories={productCategories.data} />
+            <ProductCategoryTable productCategories={productCategories.data} page={page} />
 
             {/* Pagination */}
             <BasicPagination totalPages={productCategories.totalPages} />
