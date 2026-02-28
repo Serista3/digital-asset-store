@@ -25,7 +25,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { ProductFormData } from '@/lib/validations';
 import { ActionState, Product } from '@/types';
 import { ProductCategory } from '@prisma/client';
-import Link from 'next/link';
+import { File } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useActionState } from 'react';
 
 interface ProductFormProps {
@@ -46,6 +48,7 @@ export default function ProductForm({
     errors: [],
     message: '',
   });
+  const router = useRouter()
 
   return (
     <form action={formAction}>
@@ -72,7 +75,7 @@ export default function ProductForm({
             <Select
               disabled={isPending}
               defaultValue={
-                state.oldFormData?.categoryId || formData?.category?.id
+                state.oldFormData?.categoryId || formData?.categoryId
               }
               name="categoryId"
             >
@@ -119,6 +122,20 @@ export default function ProductForm({
                 required={!formData}
                 disabled={isPending}
               />
+              {formData?.imageUrl &&
+                <div className='mt-5 flex flex-col gap-4'>
+                  <div>Current Image</div>
+                  <div className='h-100 overflow-hidden rounded-lg border border-gray-700'>
+                    <Image 
+                      src={formData?.imageUrl}
+                      alt={formData.title}
+                      width={300}
+                      height={500}
+                      className='object-cover w-full h-full'
+                    />
+                  </div>
+                </div>
+              }
             </Field>
             <Field>
               <FieldLabel htmlFor="fileUrl">File</FieldLabel>
@@ -131,6 +148,15 @@ export default function ProductForm({
                 required={!formData}
                 disabled={isPending}
               />
+              {formData?.fileUrl &&
+                <div className='mt-5 flex flex-col gap-4'>
+                  <div>Current File</div>
+                  <div className='p-4 rounded-lg border border-gray-700 flex items-center gap-2'>
+                    <File />
+                    <span>{formData.fileUrl}</span>
+                  </div>
+                </div>
+              }
             </Field>
           </div>
         </FieldSet>
@@ -148,7 +174,7 @@ export default function ProductForm({
               name="priceInCents"
               placeholder="Type price for product..."
               defaultValue={
-                state.oldFormData?.priceInCents || formData?.priceInCents || ''
+                state.oldFormData?.priceInCents || formData?.priceInCents && formData.priceInCents / 100 || ''
               }
               required
               disabled={isPending}
@@ -183,13 +209,10 @@ export default function ProductForm({
           <Button
             variant="outline"
             type="button"
-            asChild={!isPending}
             disabled={isPending}
+            onClick={() => router.back()}
           >
-            <div>
-              {!isPending && <Link href="/admin/products">Cancel</Link>}
-              {isPending && 'Cancel'}
-            </div>
+            Cancel
           </Button>
         </Field>
       </FieldGroup>

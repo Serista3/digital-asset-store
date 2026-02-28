@@ -3,6 +3,7 @@
 import db from '@/lib/db';
 import { ActionState, Product, ResultItems, SearchParams } from '@/types';
 import {
+  editProductSchema,
   ProductFormData,
   productSchema,
   validateFormData,
@@ -10,7 +11,8 @@ import {
 import { redirect } from 'next/navigation';
 import { calTotalPages, prepareQueryInfo } from '@/lib/utils';
 import { isAdminUser } from './user';
-import { uploadProductDigitalFile, uploadProductImage } from '@/lib/supabase';
+import { deleteProductDigitalFile, deleteProductImage, uploadProductDigitalFile, uploadProductImage } from '@/lib/supabase';
+import { revalidatePath } from 'next/cache';
 
 // Fetch Products
 export const getProducts = async function (searchParams: SearchParams): Promise<ResultItems<Product>> {
@@ -24,6 +26,7 @@ export const getProducts = async function (searchParams: SearchParams): Promise<
             contains: searchTerm,
             mode: 'insensitive',
           },
+          isArchived: false
         },
         skip,
         take: limit,
@@ -70,7 +73,7 @@ export const getProduct = async function (id: string,): Promise<Product | null |
   }
 };
 
-// Create Product Detail
+// Create Product
 export const createProduct = async function (
   state: ActionState<ProductFormData>,
   formData: FormData,
@@ -140,3 +143,130 @@ export const createProduct = async function (
 
   return { success: false, message: 'Unknown error occurred' };
 };
+
+// Update Product
+export const updateProduct = async function (
+  id: string,
+  state: ActionState<ProductFormData>,
+  formData: FormData,
+): Promise<ActionState<ProductFormData>> {
+  let success: boolean;
+
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    const product = await getProduct(id)
+
+    if(!product) throw new Error('Not found product.')
+    if(product instanceof(Error)) throw new Error(product.message)
+
+    const data = Object.fromEntries(formData.entries());
+    const priceInCents = Number(formData.get('priceInCents'));
+    const isAvailable = formData.get('isAvailable') === 'on' ? true : false;
+
+    const imageFile = formData.get('imageUrl') as File;
+    const digitalFile = formData.get('fileUrl') as File;
+
+    // Prepare old form data
+    const oldFormData: ProductFormData = {
+      title: String(formData.get('title')),
+      description: String(formData.get('description')),
+      priceInCents: priceInCents,
+      imageUrl: imageFile,
+      fileUrl: digitalFile,
+      isAvailable: isAvailable,
+      categoryId: String(data.categoryId),
+    };
+
+    const validationData: Record<string, unknown> = {
+      ...data,
+      isAvailable,
+      priceInCents,
+    }
+
+    if (imageFile && imageFile.size === 0) delete validationData.imageUrl;
+    if (digitalFile && digitalFile.size === 0) delete validationData.fileUrl;
+
+    const validation = validateFormData(editProductSchema, validationData);
+
+    // Validation
+    if (!validation.success)
+      return {
+        errors: validation.errors,
+        success: false,
+        oldFormData: oldFormData,
+      };
+
+    let finalImageUrl = product.imageUrl
+    let finalDigitalFileUrl = product.fileUrl;
+    
+    // Delete old image file
+    if (imageFile && imageFile.size > 0) {
+      if (product.imageUrl) {
+        await deleteProductImage(product.imageUrl);
+      }
+      finalImageUrl = await uploadProductImage(imageFile);
+    }
+
+    // Delete old digital file
+    if (digitalFile && digitalFile.size > 0) {
+      if (product.fileUrl) {
+        await deleteProductDigitalFile(product.fileUrl);
+      }
+      finalDigitalFileUrl = await uploadProductDigitalFile(digitalFile);
+    }
+    
+    // Save in DB
+    await db.product.update({
+      where: {
+        id
+      },
+      data: {
+        title: validation.data?.title ?? '',
+        description: validation.data?.description ?? '',
+        priceInCents: Math.round((validation.data?.priceInCents ?? 10) * 100) ,
+        imageUrl: finalImageUrl,
+        fileUrl: finalDigitalFileUrl,
+        isAvailable: validation.data?.isAvailable ?? false,
+        categoryId: validation.data?.categoryId ?? ''
+      },
+    });
+
+    success = true;
+  } catch (err) {
+    return {
+      message: (err as Error).message || 'Some thing went wrong',
+      success: false,
+    };
+  }
+
+  if (success) redirect('/admin/products');
+
+  return { success: false, message: 'Unknown error occurred' };
+};
+
+// Delete Product
+export const deleteProduct = async function(id: string){
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Save result in DB
+    await db.product.update({
+      where: {
+        id,
+      },
+      data: {
+        isArchived: true,
+        isAvailable: false
+      }
+    })
+
+    revalidatePath('/admin/products')
+    return { success: true, message: "Delete product success!!" };
+  }catch(err){
+    return {
+      message: (err as Error).message || 'Some thing went wrong',
+      success: false,
+    };
+  }
+}

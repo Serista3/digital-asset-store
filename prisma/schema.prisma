@@ -43,6 +43,7 @@ model Product {
   imageUrl     String
   fileUrl      String
   isAvailable  Boolean  @default(true)
+  isArchived   Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

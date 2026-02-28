@@ -7,6 +7,7 @@ import { formattedDateToRead, formattedPrice } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import ProductDelete from "./ProductDelete";
 import Link from "next/link";
 
 interface ProductTableProps {
@@ -64,7 +65,7 @@ export default function ProductTable({ products, page = 1 }: ProductTableProps) 
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem variant="destructive" asChild>
-                        {/* <CategoryDelete category={category} /> */}
+                        <ProductDelete product={product} />
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

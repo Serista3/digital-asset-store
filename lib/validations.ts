@@ -82,3 +82,8 @@ export const productSchema = z.object({
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
+
+export const editProductSchema = productSchema.extend({
+  imageUrl: productSchema.shape.imageUrl.optional(),
+  fileUrl: productSchema.shape.fileUrl.optional(),
+});

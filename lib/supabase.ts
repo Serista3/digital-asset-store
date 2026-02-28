@@ -47,3 +47,54 @@ export const uploadProductDigitalFile = async function(file: File) {
 
   return data.path
 }
+
+// Delete Product Image
+export const deleteProductImage = async function(imageUrl: string) {
+  if (!await isAdminUser()) throw new Error('You are not Admin!!');
+
+  if (!imageUrl) return;
+
+  try {
+    const pathToRemove = imageUrl.split('/').pop(); 
+
+    if (!pathToRemove) throw new Error('ไม่พบชื่อไฟล์ใน URL');
+
+    const { data, error } = await supabaseAdmin.storage
+      .from(productBucket)
+      .remove([pathToRemove]);
+
+    if (error) {
+      throw new Error('ลบรูปภาพใน Storage ไม่สำเร็จ');
+    }
+
+    return true;
+  } catch (error) {
+    throw new Error('เกิดข้อผิดพลาดในการลบรูปภาพ');
+  }
+}
+
+// Delete Product Digital File
+export const deleteProductDigitalFile = async function(fileUrl: string) {
+  if (!await isAdminUser()) throw new Error('You are not Admin!!');
+
+  if (!fileUrl) return;
+
+  try {
+    const rawPath = fileUrl.split('/').pop();
+    const pathToRemove = rawPath ? decodeURIComponent(rawPath) : null;
+
+    if (!pathToRemove) throw new Error('ไม่พบชื่อไฟล์ใน URL');
+
+    const { data, error } = await supabaseAdmin.storage
+      .from(digitalFileBucket)
+      .remove([pathToRemove]);
+
+    if (error) {
+      throw new Error('ลบไฟล์ digital ใน Storage ไม่สำเร็จ');
+    }
+
+    return true;
+  } catch (error) {
+    throw new Error('เกิดข้อผิดพลาดในการลบไฟล์');
+  }
+}
