@@ -19,8 +19,18 @@
 ## Features (คุณสมบัติเด่น)
 
 ### User
+- View product
+- Search & Filter product
+- Manage cart
+- Checkout
+- Download file -after paid
+- View order history
 
 ### Admin
+- Admin Dashboard
+- Manage Product (CRUD)
+- Manage Product Category (CRUD)
+- View orders & users
 
 ---
 
