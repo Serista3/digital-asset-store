@@ -11,7 +11,7 @@ import ProductForm from '@/components/admin/product/ProductForm';
 import AlertDestructive from '@/components/admin/AlertDestructive';
 
 import Link from 'next/link';
-import { getProductCategories } from '@/action/category';
+import { getAllCategoriesForSelect } from '@/action/category';
 import { getProduct, updateProduct } from '@/action/product';
 
 export default async function EditProduct({
@@ -22,7 +22,7 @@ export default async function EditProduct({
   const { id } = await params;
   const product = await getProduct(id);
   const updateActionWithId = updateProduct.bind(null, id);
-  const categories = await getProductCategories({});
+  const categories = await getAllCategoriesForSelect();
 
   return (
     <section className="flex flex-col gap-12">
@@ -42,11 +42,11 @@ export default async function EditProduct({
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      {'data' in categories && product && 'title' in product && (
+      {Array.isArray(categories) && product && 'title' in product && (
         <ProductForm
           formData={product}
           serverAction={updateActionWithId}
-          categories={categories.data}
+          categories={categories}
         />
       )}
       {'cause' in categories && <AlertDestructive error={categories} />}

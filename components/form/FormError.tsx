@@ -1,7 +1,7 @@
 import { ActionState } from '@/types';
 
 interface FormErrorProps {
-  state: ActionState;
+  state: ActionState<unknown>;
 }
 
 export default function FormError({ state }: FormErrorProps) {

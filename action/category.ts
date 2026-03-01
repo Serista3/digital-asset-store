@@ -8,20 +8,38 @@ import { ActionState, ProductCategory, ResultItems, SearchParams } from "@/types
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isAdminUser } from "./user";
+import { Prisma } from "@prisma/client";
+
+// Fetch All Categories for Dropdown (Select)
+export const getAllCategoriesForSelect = async function () {
+  try {
+    const categories = await db.productCategory.findMany({
+      orderBy: {
+        title: "asc",
+      },
+    });
+
+    return categories;
+  } catch (err) {
+    return err as Error;
+  }
+};
 
 // Fetch Product Categories
 export const getProductCategories = async function (searchParams: SearchParams): Promise<ResultItems<ProductCategory>> {
   const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
 
+  const baseWhere: Prisma.ProductCategoryWhereInput = {
+    title: {
+      contains: searchTerm,
+      mode: "insensitive",
+    },
+  }
+
   try {
     const [data, totalItems] = await db.$transaction([
       db.productCategory.findMany({
-        where: {
-          title: {
-            contains: searchTerm,
-            mode: "insensitive",
-          },
-        },
+        where: baseWhere,
         orderBy: {
           createdAt: "desc",
         },
@@ -32,12 +50,7 @@ export const getProductCategories = async function (searchParams: SearchParams):
         }
       }),
       db.productCategory.count({
-        where: {
-          title: {
-            contains: searchTerm,
-            mode: "insensitive",
-          },
-        },
+        where: baseWhere
       }),
     ]);
 
