@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import AdminNavigation from '@/components/layout/navigation/AdminNavigation';
+import { Toaster } from '@/components/ui/sonner';
 import { inter } from '../fonts';
 import '../globals.css';
 
@@ -22,6 +23,7 @@ export default function RootLayout({
           <main className="min-h-screen max-w-275 mx-auto px-4 pt-10 pb-15">
             {children}
           </main>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

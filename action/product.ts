@@ -9,7 +9,7 @@ import {
   validateFormData,
 } from '@/lib/validations';
 import { redirect } from 'next/navigation';
-import { calTotalPages, prepareQueryInfo } from '@/lib/utils';
+import { calTotalPages, errorMessage, prepareQueryInfo } from '@/lib/utils';
 import { isAdminUser } from './user';
 import { deleteProductDigitalFile, deleteProductImage, uploadProductDigitalFile, uploadProductImage } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
@@ -98,13 +98,13 @@ export const createProduct = async function (
       categoryId: String(data.categoryId),
     };
 
+    // Validation
     const validation = validateFormData(productSchema, {
       ...data,
       isAvailable,
       priceInCents,
     });
-
-    // Validation
+    
     if (!validation.success)
       return {
         errors: validation.errors,
@@ -112,7 +112,7 @@ export const createProduct = async function (
         oldFormData: oldFormData,
       };
     
-    // uploade file to bucket storage
+    // Uploade file to bucket storage
     const [productImageUrl, productDigitalFile] = await Promise.all([
       uploadProductImage(validation.data!.imageUrl),
       uploadProductDigitalFile(validation.data!.fileUrl)
@@ -133,15 +133,12 @@ export const createProduct = async function (
 
     success = true;
   } catch (err) {
-    return {
-      message: (err as Error).message || 'Some thing went wrong',
-      success: false,
-    };
+    return errorMessage('custom', err as Error)
   }
 
   if (success) redirect('/admin/products');
 
-  return { success: false, message: 'Unknown error occurred' };
+  return errorMessage('unknown');
 };
 
 // Update Product
@@ -178,6 +175,7 @@ export const updateProduct = async function (
       categoryId: String(data.categoryId),
     };
 
+    // Validation
     const validationData: Record<string, unknown> = {
       ...data,
       isAvailable,
@@ -189,7 +187,6 @@ export const updateProduct = async function (
 
     const validation = validateFormData(editProductSchema, validationData);
 
-    // Validation
     if (!validation.success)
       return {
         errors: validation.errors,
@@ -234,15 +231,12 @@ export const updateProduct = async function (
 
     success = true;
   } catch (err) {
-    return {
-      message: (err as Error).message || 'Some thing went wrong',
-      success: false,
-    };
+    return errorMessage('custom', err as Error)
   }
 
   if (success) redirect('/admin/products');
 
-  return { success: false, message: 'Unknown error occurred' };
+  return errorMessage('unknown');
 };
 
 // Delete Product
@@ -264,9 +258,6 @@ export const deleteProduct = async function(id: string){
     revalidatePath('/admin/products')
     return { success: true, message: "Delete product success!!" };
   }catch(err){
-    return {
-      message: (err as Error).message || 'Some thing went wrong',
-      success: false,
-    };
+    return errorMessage('custom', err as Error)
   }
 }

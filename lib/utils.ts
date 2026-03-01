@@ -1,10 +1,32 @@
 import { LIMIT_RESULT } from '@/action/constants';
-import { SearchParams } from '@/types';
+import { ActionState, ErrorMesg, SearchParams } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// Create error message
+export const errorMessage = function(typeMesg: ErrorMesg, err?: Error){
+  if(typeMesg === 'custom' && err) {
+    return {
+      message: (err as Error).message || "Some thing went wrong",
+      success: false,
+    };
+  }
+
+  return { success: false, message: "Unknown error occurred" };
+}
+
+// Show notification
+export const showNoti = function(result: ActionState<unknown>){
+  if (result.success) {
+    toast.success(result.message, { position: 'top-center' });
+  } else {
+    toast.error(result.message, { position: 'top-center' });
+  }
 }
 
 // Calculate pre-data

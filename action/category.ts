@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
-import { calTotalPages, prepareQueryInfo } from "@/lib/utils";
+import { calTotalPages, errorMessage, prepareQueryInfo } from "@/lib/utils";
 import { ProductCategoryFormData, productCategorySchema, validateFormData } from "@/lib/validations";
 import { ActionState, ProductCategory, ResultItems, SearchParams } from "@/types";
 
@@ -97,15 +97,12 @@ export const createProductCategory = async function (
 
     success = true;
   } catch (err) {
-    return {
-      message: (err as Error).message || "Some thing went wrong",
-      success: false,
-    };
+    return errorMessage('custom', err as Error)
   }
 
   if (success) redirect("/admin/product-categories");
 
-  return { success: false, message: "Unknown error occurred" };
+  return errorMessage('unknown');
 };
 
 // Update Product Category
@@ -142,15 +139,12 @@ export const updateProductCategory = async function (
 
     success = true;
   } catch (err) {
-    return {
-      message: (err as Error).message || "Some thing went wrong",
-      success: false,
-    };
+    return errorMessage('custom', err as Error)
   }
 
   if (success) redirect("/admin/product-categories");
 
-  return { success: false, message: "Unknown error occurred" };
+  return errorMessage('unknown');
 };
 
 // Delete Product Category
@@ -167,11 +161,9 @@ export const deleteProductCategory = async function (id: string) {
     // Clear cache
     revalidatePath("/admin/product-categories");
 
-    return { success: true, message: "Delete product category success!!" };
+    // Success Notify
+    return {success: true, message: 'Delete product category success!!'}
   } catch (err) {
-    return {
-      message: (err as Error).message || "Some thing went wrong",
-      success: false,
-    };
+    return errorMessage('custom', err as Error)
   }
 };

@@ -3,12 +3,14 @@
 import { ProductCategory } from '@/types';
 import { AlertDialogDestructive } from '../AlertDialogDestructive';
 import { deleteProductCategory } from '@/action/category';
+import { showNoti } from '@/lib/utils';
 
-export default function CategoryDelete({
-  category,
-}: {
-  category: ProductCategory;
-}) {
+export default function CategoryDelete({ category }: { category: ProductCategory }) {
+  const handleDelete = async () => {
+    const result = await deleteProductCategory(category.id);
+    showNoti(result)
+  };
+
   return (
     <AlertDialogDestructive
       btnText="Delete"
@@ -20,7 +22,7 @@ export default function CategoryDelete({
           sure for that?
         </>
       }
-      onDelete={() => deleteProductCategory(category.id)}
+      onDelete={handleDelete}
     />
   );
 }

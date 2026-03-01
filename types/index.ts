@@ -1,5 +1,7 @@
 import z from 'zod';
 
+export type ErrorMesg = 'custom' | 'unknown'
+
 export interface ActionState<T> {
   errors?: z.core.$ZodIssue[] | undefined;
   message?: string;
