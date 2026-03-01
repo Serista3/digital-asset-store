@@ -17,8 +17,12 @@ export type ResultItems<T> =
   | Error;
 
 export interface SearchParams {
-  search?: string
-  page?: number
+  search?: string;
+  page?: string;
+}
+
+export interface ProductSearchParams extends SearchParams {
+  categoryId: string;
 }
 
 export interface User {

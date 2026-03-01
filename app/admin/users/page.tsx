@@ -13,7 +13,7 @@ interface UsersProps {
 
 export default async function Users({ searchParams }: UsersProps) {
   const { search, page } = await searchParams;
-  const users = await getUsers({ search, page: Number(page ?? 1) });
+  const users = await getUsers({ search, page });
 
   return (
     <ExplorerLayout title="Users">
@@ -26,7 +26,7 @@ export default async function Users({ searchParams }: UsersProps) {
             </div>
 
             {/* User Table */}
-            <UserTable users={users.data} page={page} />
+            <UserTable users={users.data} page={Number(page ?? 1)} />
 
             {/* Pagination */}
             <BasicPagination totalPages={users.totalPages} />

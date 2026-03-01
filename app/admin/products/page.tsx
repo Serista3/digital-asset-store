@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
-import { getProducts } from '@/action/product';
+import { getAdminProducts } from '@/action/product';
 import { SearchParams } from '@/types';
 
 interface ProductsProps {
@@ -16,7 +16,7 @@ interface ProductsProps {
 
 export default async function Products({ searchParams }: ProductsProps) {
   const { search, page } = await searchParams;
-  const products = await getProducts({ search, page: Number(page ?? 1) });
+  const products = await getAdminProducts({ search, page });
 
   return (
     <ExplorerLayout title="Products">
@@ -34,7 +34,7 @@ export default async function Products({ searchParams }: ProductsProps) {
           </div>
 
           {/* Product Table */}
-          <ProductTable products={products.data} page={page} />
+          <ProductTable products={products.data} page={Number(page ?? 1)} />
 
           {/* Pagination */}
           <BasicPagination totalPages={products.totalPages} />

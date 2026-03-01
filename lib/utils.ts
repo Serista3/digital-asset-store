@@ -30,9 +30,9 @@ export const showNoti = function(result: ActionState<unknown>){
 }
 
 // Calculate pre-data
-export const prepareQueryInfo = function({ search = '', page = 1 }: SearchParams){
+export const prepareBaseQueryInfo = function({ search = '', page = '1' }: SearchParams){
   const searchTerm = search?.trim().toLocaleLowerCase() || "";
-  const skip = (page - 1) * LIMIT_RESULT;
+  const skip = (Number(page) - 1) * LIMIT_RESULT;
 
   return {
     searchTerm,

@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/lib/db';
-import { calTotalPages, prepareQueryInfo } from '@/lib/utils';
+import { calTotalPages, prepareBaseQueryInfo } from '@/lib/utils';
 import { ResultItems, SearchParams, User } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 
@@ -13,7 +13,7 @@ export const isAdminUser = async function(){
 
 // Fetch Users
 export const getUsers = async function (searchParams: SearchParams): Promise<ResultItems<User>> {
-  const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
+  const { searchTerm, skip, limit } = prepareBaseQueryInfo(searchParams)
 
   try {
     const [users, totalUsers] = await db.$transaction([

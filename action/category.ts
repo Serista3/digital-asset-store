@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
-import { calTotalPages, errorMessage, prepareQueryInfo } from "@/lib/utils";
+import { calTotalPages, errorMessage, prepareBaseQueryInfo } from "@/lib/utils";
 import { ProductCategoryFormData, productCategorySchema, validateFormData } from "@/lib/validations";
 import { ActionState, ProductCategory, ResultItems, SearchParams } from "@/types";
 
@@ -10,24 +10,9 @@ import { redirect } from "next/navigation";
 import { isAdminUser } from "./user";
 import { Prisma } from "@prisma/client";
 
-// Fetch All Categories for Dropdown (Select)
-export const getAllCategoriesForSelect = async function () {
-  try {
-    const categories = await db.productCategory.findMany({
-      orderBy: {
-        title: "asc",
-      },
-    });
-
-    return categories;
-  } catch (err) {
-    return err as Error;
-  }
-};
-
-// Fetch Product Categories
-export const getProductCategories = async function (searchParams: SearchParams): Promise<ResultItems<ProductCategory>> {
-  const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
+// Fetch categories for admin
+export const getAdminCategories = async function(searchParams: SearchParams): Promise<ResultItems<ProductCategory>>{
+  const { searchTerm, skip, limit } = prepareBaseQueryInfo(searchParams)
 
   const baseWhere: Prisma.ProductCategoryWhereInput = {
     title: {
@@ -46,26 +31,57 @@ export const getProductCategories = async function (searchParams: SearchParams):
         take: limit,
         skip,
         include: {
-          products: true
+          products: {
+            where: { isArchived: false }
+          }
         }
       }),
-      db.productCategory.count({
-        where: baseWhere
-      }),
+
+      db.productCategory.count({ where: baseWhere })
     ]);
 
     const totalPages = calTotalPages(totalItems);
+    return { data, totalPages };
+  } catch (err) {
+    return err as Error;
+  }
+}
 
-    return {
-      data,
-      totalPages,
-    };
+// Fetch categories for dropdown (select)
+export const getCategoriesForSelect = async function () {
+  try {
+    return await db.productCategory.findMany({
+      select: {
+        id: true,
+        title: true,
+      },
+      orderBy: { title: "asc" }
+    })
   } catch (err) {
     return err as Error;
   }
 };
 
-// Fetch Product Category Detail
+// Fetch categories for storefront
+export const getStorefrontCategories = async () => { 
+  try {
+    return await db.productCategory.findMany({
+      where: {
+        products: {
+          some: {
+            isAvailable: true,
+            isArchived: false,
+          }
+        }
+      },
+      orderBy: { title: "asc" }
+    })
+  } catch (err) {
+    return err as Error;
+  }
+}
+
+// Fetch product category detail
 export const getProductCategory = async function (id: string): Promise<ProductCategory | null | Error> {
   try {
     const productCategory = await db.productCategory.findFirst({
@@ -80,7 +96,7 @@ export const getProductCategory = async function (id: string): Promise<ProductCa
   }
 };
 
-// Create Product Category
+// Create product category
 export const createProductCategory = async function (
   state: ActionState<ProductCategoryFormData>,
   formData: FormData,
@@ -118,7 +134,7 @@ export const createProductCategory = async function (
   return errorMessage('unknown');
 };
 
-// Update Product Category
+// Update product category
 export const updateProductCategory = async function (
   id: string,
   state: ActionState<ProductCategoryFormData>,
@@ -160,7 +176,7 @@ export const updateProductCategory = async function (
   return errorMessage('unknown');
 };
 
-// Delete Product Category
+// Delete product category
 export const deleteProductCategory = async function (id: string) {
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')

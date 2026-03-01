@@ -24,7 +24,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { ProductFormData } from '@/lib/validations';
 import { ActionState, Product } from '@/types';
-import { ProductCategory } from '@prisma/client';
 import { File } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -36,7 +35,7 @@ interface ProductFormProps {
     state: ActionState<ProductFormData>,
     formData: FormData,
   ) => Promise<ActionState<ProductFormData>>;
-  categories: ProductCategory[];
+  categories: {id: string, title: string}[];
 }
 
 export default function ProductForm({

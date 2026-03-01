@@ -1,59 +1,78 @@
 'use server';
 
 import db from '@/lib/db';
-import { ActionState, Product, ResultItems, SearchParams } from '@/types';
+import { ActionState, Product, ProductSearchParams, ResultItems, SearchParams } from '@/types';
 import { editProductSchema, ProductFormData, productSchema, validateFormData } from '@/lib/validations';
 import { redirect } from 'next/navigation';
-import { calTotalPages, errorMessage, prepareQueryInfo } from '@/lib/utils';
+import { calTotalPages, errorMessage, prepareBaseQueryInfo } from '@/lib/utils';
 import { isAdminUser } from './user';
 import { deleteProductDigitalFile, deleteProductImage, uploadProductDigitalFile, uploadProductImage } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { Prisma } from '@prisma/client';
 
-// Fetch Products
-export const getProducts = async function (searchParams: SearchParams): Promise<ResultItems<Product>> {
-  const { searchTerm, skip, limit } = prepareQueryInfo(searchParams)
+// Fetch products for storefront
+export const getStorefrontProducts = async function(searchParams: ProductSearchParams){
+  const { skip, limit } = prepareBaseQueryInfo(searchParams)
+
+  const whereConditional: Prisma.ProductWhereInput = {
+    categoryId: searchParams.categoryId,
+    isAvailable: true,
+    isArchived: false,
+  }
 
   try {
     const [products, totalItems] = await db.$transaction([
       db.product.findMany({
-        where: {
-          title: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
-          isArchived: false
-        },
+        where: whereConditional,
         skip,
         take: limit,
-        orderBy: {
-          createdAt: 'desc',
-        },
-        include: {
-          category: true
-        }
+        orderBy: { createdAt: 'desc' },
+        include: { category: true }
       }),
 
-      db.product.count({
-        where: {
-          title: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
-        },
-      }),
+      db.product.count({ where: whereConditional }),
     ]);
 
     const totalPages = calTotalPages(totalItems);
-    return {
-      data: products,
-      totalPages,
-    };
+    return { data: products, totalPages };
+  } catch (err) {
+    return err as Error;
+  }
+}
+
+// Fetch admin products
+export const getAdminProducts = async function (searchParams: SearchParams): Promise<ResultItems<Product>> {
+  const { searchTerm, skip, limit } = prepareBaseQueryInfo(searchParams)
+
+  const whereConditional: Prisma.ProductWhereInput = {
+    title: {
+      contains: searchTerm,
+      mode: 'insensitive',
+    },
+    isArchived: false
+  }
+
+  try {
+    const [products, totalItems] = await db.$transaction([
+      db.product.findMany({
+        where: whereConditional,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: { category: true }
+      }),
+
+      db.product.count({ where: whereConditional })
+    ]);
+
+    const totalPages = calTotalPages(totalItems);
+    return { data: products, totalPages };
   } catch (err) {
     return err as Error;
   }
 };
 
-// Fetch Product Detail
+// Fetch product detail
 export const getProduct = async function (id: string,): Promise<Product | null | Error> {
   try {
     const product = await db.product.findFirst({
@@ -68,7 +87,7 @@ export const getProduct = async function (id: string,): Promise<Product | null |
   }
 };
 
-// Create Product
+// Create product
 export const createProduct = async function (
   state: ActionState<ProductFormData>,
   formData: FormData,
@@ -136,7 +155,7 @@ export const createProduct = async function (
   return errorMessage('unknown');
 };
 
-// Update Product
+// Update product
 export const updateProduct = async function (
   id: string,
   state: ActionState<ProductFormData>,
@@ -234,7 +253,7 @@ export const updateProduct = async function (
   return errorMessage('unknown');
 };
 
-// Delete Product
+// Delete product
 export const deleteProduct = async function(id: string){
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')

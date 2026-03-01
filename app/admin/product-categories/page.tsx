@@ -7,7 +7,7 @@ import ExplorerLayout from '@/components/layout/ExplorerLayout';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
-import { getProductCategories } from '@/action/category';
+import { getAdminCategories } from '@/action/category';
 import { SearchParams } from '@/types';
 
 interface ProductCategoriesProps {
@@ -16,7 +16,7 @@ interface ProductCategoriesProps {
 
 export default async function ProductCategories({ searchParams }: ProductCategoriesProps) {
   const { search, page } = await searchParams;
-  const productCategories = await getProductCategories({ search, page: Number(page ?? 1)});
+  const productCategories = await getAdminCategories({ search, page });
 
   return (
     <ExplorerLayout title="Product Categories">
@@ -35,7 +35,7 @@ export default async function ProductCategories({ searchParams }: ProductCategor
             </div>
 
             {/* Category Table */}
-            <ProductCategoryTable productCategories={productCategories.data} page={page} />
+            <ProductCategoryTable productCategories={productCategories.data} page={Number(page ?? 1)} />
 
             {/* Pagination */}
             <BasicPagination totalPages={productCategories.totalPages} />

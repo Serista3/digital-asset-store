@@ -11,11 +11,11 @@ import ProductForm from '@/components/admin/product/ProductForm';
 import AlertDestructive from '@/components/admin/AlertDestructive';
 
 import Link from 'next/link';
-import { getAllCategoriesForSelect } from '@/action/category';
+import { getCategoriesForSelect } from '@/action/category';
 import { createProduct } from '@/action/product';
 
 export default async function NewProduct() {
-  const categories = await getAllCategoriesForSelect();
+  const categories = await getCategoriesForSelect();
 
   return (
     <section className="flex flex-col gap-12">
