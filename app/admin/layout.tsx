@@ -3,6 +3,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import AdminNavigation from '@/components/layout/navigation/AdminNavigation';
 import { Toaster } from '@/components/ui/sonner';
 import { inter } from '../fonts';
+import Providers from '../providers';
 import '../globals.css';
 
 export const metadata: Metadata = {
@@ -19,11 +20,13 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className="dark">
         <body className={`${inter.className} antialiased`}>
-          <AdminNavigation />
-          <main className="min-h-screen max-w-275 mx-auto px-4 pt-10 pb-15">
-            {children}
-          </main>
-          <Toaster />
+          <Providers>
+            <AdminNavigation />
+            <main className="min-h-screen max-w-275 mx-auto px-4 pt-10 pb-15">
+              {children}
+            </main>
+            <Toaster />
+          </Providers>
         </body>
       </html>
     </ClerkProvider>

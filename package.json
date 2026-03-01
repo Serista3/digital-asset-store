@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
+    "@bprogress/next": "^3.2.12",
     "@clerk/nextjs": "^6.38.1",
     "@prisma/client": "^6.19.2",
     "@supabase/supabase-js": "^2.97.0",

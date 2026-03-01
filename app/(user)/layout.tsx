@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { inter } from '../fonts';
 import MainNavigation from '@/components/layout/navigation/MainNavigation';
 import Footer from '@/components/layout/footer/Footer';
+import Providers from '../providers';
 import '../globals.css'
 
 export const metadata: Metadata = {
@@ -20,13 +21,15 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${inter.className} antialiased`}>
-          <MainNavigation />
-          <TooltipProvider>
-            <main className='min-h-screen max-w-275 mx-auto px-4 pt-10 pb-15'>
-              {children}
-            </main>
-          </TooltipProvider>
-          <Footer />
+          <Providers color='#000'>
+            <MainNavigation />
+            <TooltipProvider>
+              <main className='min-h-screen max-w-275 mx-auto px-4 pt-10 pb-15'>
+                {children}
+              </main>
+            </TooltipProvider>
+            <Footer />
+          </Providers>
         </body>
       </html>
     </ClerkProvider>
