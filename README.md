@@ -1,5 +1,5 @@
 # Digital Asset Store
-![Project Banner](https://github.com/user-attachments/assets/e8cbaf7f-ef6b-41a6-9ca3-3f45fda37c99)
+![Project Banner](https://github.com/user-attachments/assets/ba22f6ed-caf7-4b15-8c52-a430c9da7ea3)
 > **Web Application สำหรับซื้อขายสินค้นดิจิทัล** ช่วยให้คุณเข้าถึงสินค้าดิจิทัลที่ต้องการไม่ว่าจะเป็น E-Book, Source Code หรืออื่นๆ ได้อย่างสะดวกรวดเร็ว
 
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
