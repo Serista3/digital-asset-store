@@ -15,7 +15,12 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
   const { skip, limit } = prepareBaseQueryInfo(searchParams)
 
   const whereConditional: Prisma.ProductWhereInput = {
-    categoryId: searchParams.categoryId,
+    category: {
+      title: {
+        contains: searchParams.category?.trim(),
+        mode: 'insensitive'
+      }
+    },
     isAvailable: true,
     isArchived: false,
   }

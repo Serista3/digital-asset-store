@@ -8,72 +8,71 @@ import Paragraph from '@/components/typography/Paragraph';
 import { getStorefrontProducts } from '@/action/product';
 import { Product, ProductCategory } from '@/types';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface CategoryTabsLineProps {
   categories: ProductCategory[];
+  category: string;
 }
 
 export default function CategoryTabsLine({
   categories,
+  category,
 }: CategoryTabsLineProps) {
-  const firstCategoryId = categories[0]?.id;
-  const [selectedTab, setSelectedTab] = useState(firstCategoryId);
+  const firstCategory = categories[0]?.title;
+  const finalCategory = category ?? firstCategory
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch product base on category param
   useEffect(() => {
-    const fetchInitialData = async function (selectedTab: string) {
-      setIsLoading(true);
+    const fetchInitialData = async function () {
+      try {
+        setIsLoading(true);
 
-      const fetchProduct = await getStorefrontProducts({ categoryId: selectedTab });
+      const fetchProduct = await getStorefrontProducts({ category: finalCategory });
+
       if ('data' in fetchProduct) {
         setProducts([...fetchProduct.data]);
       }
 
-      setIsLoading(false);
+      } catch(err) {
+        toast.error((err as Error).message, { position: 'top-center' })
+        setProducts([])
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    fetchInitialData(selectedTab);
-  }, [selectedTab]);
+    fetchInitialData();
+  }, [finalCategory]);
 
   return (
-    <Tabs
-      className=""
-      value={selectedTab}
-      onValueChange={setSelectedTab}
-      defaultValue={firstCategoryId}
-    >
-      <TabsList
-        variant="line"
-        className="max-w-275 overflow-x-auto overflow-y-hidden"
-      >
-        {categories.map((category) => (
-          <TabsTrigger
-            onClick={() => setSelectedTab(category.id)}
-            key={category.id}
-            value={category.id}
-          >
-            {category.title}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+    <Tabs value={finalCategory}>
+      <div className="max-w-275 overflow-x-auto overflow-y-hidden">
+        <TabsList variant="line">
+          {categories.map((cat) => (
+            <TabsTrigger key={cat.id} value={cat.title} asChild>
+              <Link href={`?category=${cat.title}`}>{cat.title}</Link>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
 
-      {categories.map((category) => (
-        <TabsContent key={category.id} value={category.id}>
-          {selectedTab === category.id && (
-            <>
-              {isLoading ? (
-                <Loading />
-              ) : products.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 mt-6">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              ) : (
-                <Paragraph>No product available.</Paragraph>
-              )}
-            </>
+      {/* Render Products */}
+      {categories.map((cat) => (
+        <TabsContent key={cat.id} value={cat.title}>
+          {isLoading ? (
+            <Loading />
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 mt-6">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <Paragraph>No product available.</Paragraph>
           )}
         </TabsContent>
       ))}

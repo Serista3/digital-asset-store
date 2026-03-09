@@ -22,7 +22,7 @@ export default function HomeCarousel({ products }: HomeCarouselProps) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <div className='absolute top-3 right-3 flex items-center gap-1'>
+      <div className='absolute top-3 right-3 flex items-center gap-2'>
         <CarouselPrevious className='static translate-0' />
         <CarouselNext className='static translate-0' />
       </div>

@@ -32,7 +32,7 @@ export default function WideProductCard({ product, className }: WideProductCardP
           <Paragraph className="line-clamp-1">{product.description}</Paragraph>
         </CardHeader>
         <CardFooter className="px-0 self-start">
-          <Button className="w-full border border-gray-600" asChild>
+          <Button variant='default' className="w-full border border-gray-600" asChild>
             <Link href={`/products/${product.id}`}>Product Detail</Link>
           </Button>
         </CardFooter>

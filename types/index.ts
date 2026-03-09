@@ -22,7 +22,7 @@ export interface SearchParams {
 }
 
 export interface ProductSearchParams extends SearchParams {
-  categoryId: string;
+  category?: string;
 }
 
 export interface User {

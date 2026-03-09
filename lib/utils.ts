@@ -58,5 +58,5 @@ export const formattedDateToRead = function(date: Date){
 
 // Formatted Price
 export const formattedPrice = function(price: number){
-  return (price / 100).toFixed(2) + ' USD'
+  return (price / 100).toFixed(2) + ' THB'
 }
