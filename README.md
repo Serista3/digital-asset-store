@@ -1,6 +1,6 @@
 # Digital Asset Store
 ![Project Banner](https://github.com/user-attachments/assets/ba22f6ed-caf7-4b15-8c52-a430c9da7ea3)
-> **Web Application สำหรับซื้อขายสินค้นดิจิทัล** ช่วยให้คุณเข้าถึงสินค้าดิจิทัลที่ต้องการไม่ว่าจะเป็น E-Book, Source Code หรืออื่นๆ ได้อย่างสะดวกรวดเร็ว
+> **Web Application สำหรับซื้อขายสินค้าดิจิทัล** ช่วยให้คุณเข้าถึงสินค้าดิจิทัลที่ต้องการไม่ว่าจะเป็น E-Book, Source Code หรืออื่นๆ ได้อย่างสะดวกรวดเร็ว
 
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
@@ -37,4 +37,77 @@
 ## Database Design (ER Diagram)
 <img width="1413" height="1011" alt="Untitled" src="https://github.com/user-attachments/assets/48f16097-b1a1-442a-b254-f5891227f2ec" />
 
-> Designed by me.
+> Designed by Thanapat Malikaew based on real world.
+
+## Installation & Setup
+**สิ่งที่ต้องมีก่อนเริ่ม:**
+1. Vs Code
+2. Node.js
+3. PostgreSQL
+
+---
+
+### การติดตั้ง
+1. clone โปรเจคลงเครื่อง local
+
+```bash
+git clone https://github.com/Serista3/digital-asset-store.git
+
+```
+
+2. ติดตั้ง dependencies ลงในโปรเจคทั้งหมด
+
+```bash
+npm install
+
+```
+
+### Config Environment
+**หมายเหตุ:** 
+เนื่องจากไม่สามารถเปิดเผยข้อมูลได้ทั้งหมด กรุณาติดต่อมาที่ email: stacla5282@gmail.com เพื่อขอเข้าร่วมการพัฒนาโปรเจคครับ 🙏
+
+```bash
+# NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
+# NEXT_PUBLIC_CLERK_SIGN_UP_URL=/register
+# NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+# NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+
+# ข้อมูล Environment Variables อื่นๆ ที่จำเป็นต้องตั้งค่าเพิ่มเติม 
+# กรุณาติดต่อตามอีเมลในหมายเหตุด้านบนครับ
+
+```
+
+### Prisma เบื้องต้น
+
+1. update คำสั่งใน @prisma/client ให้เป็นปัจจุบัน
+
+```bash
+npx prisma generate
+
+```
+
+2. migrate ตารางขึ้นไปบน Supabase
+
+```bash
+npx prisma db push
+
+```
+
+3. เปิดดูข้อมูลใน Database แบบ realtime
+
+```bash
+npx prisma studio
+
+```
+
+### Start Development Server
+
+```bash
+npm run dev
+
+```
+
+---
+
+## ติดต่อผู้พัฒนา
+- Email: stacla5282@gmail.com
