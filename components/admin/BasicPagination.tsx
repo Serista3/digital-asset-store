@@ -86,7 +86,7 @@ export default function BasicPagination({
             <PaginationItem key={page}>
               <Link
                 href={createPageURL(page)}
-                className={`${currentPage === page ? 'text-black bg-white' : ''} rounded-sm px-2.5 py-1.25`}
+                className={`${currentPage === page ? 'text-white bg-black dark:text-black dark:bg-white' : ''} rounded-sm px-2.5 py-1.25`}
               >
                 {page}
               </Link>

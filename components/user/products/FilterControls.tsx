@@ -63,7 +63,7 @@ export default function FilterControls({ categories }: FilterControlsProps) {
     // Set Search Params
     formData.entries().forEach(([key, value]) => {
       if (key.includes('price')) return;
-      console.log(key, value)
+
       if (value) {
         params.set(key, value.toString());
       } else {
@@ -76,6 +76,8 @@ export default function FilterControls({ categories }: FilterControlsProps) {
     } else {
       params.delete('isAvailable');
     }
+
+    params.delete('page');
 
     params.set('price_gte', priceVal[0].toString());
     params.set('price_lte', priceVal[1].toString());
@@ -95,7 +97,7 @@ export default function FilterControls({ categories }: FilterControlsProps) {
   };
 
   return (
-    <div className="w-full max-w-md border-gray-200 border rounded-lg p-4 shadow-lg">
+    <div className="w-full border-gray-200 border rounded-lg p-6 shadow-lg self-start">
       <form onSubmit={handleForm} key={searchParams.toString()}>
         <FieldGroup>
           <div className="flex flex-col gap-3.5">
@@ -107,7 +109,7 @@ export default function FilterControls({ categories }: FilterControlsProps) {
             </Paragraph>
             {/* Sort Select */}
             <Select name="sortBy" defaultValue={sortByVal} disabled={isPending}>
-              <SelectTrigger id="checkout-exp-month-ts6">
+              <SelectTrigger className='w-full'>
                 <SelectValue placeholder="Select sort value." />
               </SelectTrigger>
               <SelectContent>
@@ -177,7 +179,7 @@ export default function FilterControls({ categories }: FilterControlsProps) {
 
               {/* Field Price  */}
               <Field orientation="horizontal">
-                <div className="mx-auto grid w-full max-w-xs gap-3">
+                <div className="grid w-full gap-3">
                   <div className="flex items-center justify-between gap-2">
                     <Label htmlFor="price" className="text-base">
                       Price
@@ -213,7 +215,7 @@ export default function FilterControls({ categories }: FilterControlsProps) {
               </Field>
             </FieldGroup>
           </div>
-          <div className="mt-6 flex flex-col gap-2">
+          <div className="mt-4 flex flex-col gap-2">
             <SubmitButton btnText="Apply Filter" />
             <Button
               variant="outline"

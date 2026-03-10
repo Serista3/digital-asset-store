@@ -71,7 +71,7 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
     ]);
 
     const totalPages = calTotalPages(totalItems);
-    return { data: products, totalPages };
+    return { data: products, totalPages, totalItems };
   } catch (err) {
     return err as Error;
   }
