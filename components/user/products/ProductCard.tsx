@@ -1,7 +1,8 @@
 import Heading from '@/components/typography/Heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
+
 import { formattedPrice } from '@/lib/utils';
 import { Product } from '@/types';
 import { CirclePlus } from 'lucide-react';

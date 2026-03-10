@@ -6,7 +6,9 @@ import Paragraph from '@/components/typography/Paragraph';
 import HomeCarousel from '@/components/user/home/HomeCarousel';
 import CategoryTabsLine from '@/components/user/home/CategoryTabsLine';
 
-export default async function Home({ searchParams }: { searchParams: { category: string } }) {
+import { ProductSearchParams } from '@/types';
+
+export default async function Home({ searchParams }: { searchParams: Promise<ProductSearchParams> }) {
   const products = await getStorefrontProducts({});
   const isProducts = 'data' in products;
 

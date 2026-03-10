@@ -8,7 +8,6 @@ const Providers = ({ color = '#fff', children }: { color?: string, children: Rea
       height="3px"
       color={color}
       options={{ showSpinner: false }}
-      shallowRouting
     >
       {children}
     </ProgressProvider>

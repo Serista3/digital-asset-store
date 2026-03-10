@@ -14,14 +14,44 @@ import { Prisma } from '@prisma/client';
 export const getStorefrontProducts = async function(searchParams: ProductSearchParams){
   const { skip, limit } = prepareBaseQueryInfo(searchParams)
 
+  // Order by
+  let orderByCondition: Prisma.ProductOrderByWithRelationInput = { 
+    createdAt: 'desc'
+  };
+
+  if (searchParams.sortBy === 'price_desc') {
+    orderByCondition = { priceInCents: 'desc' };
+  }else if (searchParams.sortBy === 'price_asc') {
+    orderByCondition = { priceInCents: 'asc' };
+  }else if (searchParams.sortBy === 'title_desc') {
+    orderByCondition = { title: 'desc' };
+  }else if (searchParams.sortBy === 'title_asc') {
+    orderByCondition = { title: 'asc' };
+  }
+
+  // Filter by
+  const finalTitle = searchParams.title?.toLocaleLowerCase().trim() || ''
+  const finalCategory = searchParams.category?.trim() || ''
+  const finalPriceGte = Number(searchParams.price_gte ?? 0) * 100
+  const finalPriceIte = Number(searchParams.price_ite ?? 1000000) * 100
+  const finalIsAvailable = searchParams.isAvaliable ? searchParams.isAvaliable === 'true' : true
+
   const whereConditional: Prisma.ProductWhereInput = {
     category: {
       title: {
-        contains: searchParams.category?.trim(),
+        contains: finalCategory,
         mode: 'insensitive'
       }
     },
-    isAvailable: true,
+    title: {
+      contains: finalTitle,
+      mode: 'insensitive'
+    },
+    priceInCents: {
+      gte: finalPriceGte,
+      lte: finalPriceIte
+    },
+    isAvailable: finalIsAvailable,
     isArchived: false,
   }
 
@@ -31,7 +61,7 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
         where: whereConditional,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: orderByCondition,
         include: { category: true }
       }),
 

@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 
 interface CategoryTabsLineProps {
   categories: ProductCategory[];
-  category: string;
+  category?: string;
 }
 
 export default function CategoryTabsLine({
