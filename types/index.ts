@@ -28,8 +28,8 @@ export interface ProductSearchParams extends SearchParams {
   sortBy?: 'title_asc' | 'title_desc' | 'price_desc' | 'price_asc';
   title?: string;
   price_gte?: string;
-  price_ite?: string;
-  isAvaliable?: string;
+  price_lte?: string;
+  isAvailable?: string;
 }
 
 export interface User {

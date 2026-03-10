@@ -33,8 +33,10 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
   const finalTitle = searchParams.title?.toLocaleLowerCase().trim() || ''
   const finalCategory = searchParams.category?.trim() || ''
   const finalPriceGte = Number(searchParams.price_gte ?? 0) * 100
-  const finalPriceIte = Number(searchParams.price_ite ?? 1000000) * 100
-  const finalIsAvailable = searchParams.isAvaliable ? searchParams.isAvaliable === 'true' : true
+  const finalPriceIte = Number(searchParams.price_lte ?? 1000000) * 100
+
+  const isAvailableParam = searchParams.isAvailable;
+  const finalIsAvailable = isAvailableParam === 'true' ? true : undefined;
 
   const whereConditional: Prisma.ProductWhereInput = {
     category: {
@@ -51,7 +53,7 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
       gte: finalPriceGte,
       lte: finalPriceIte
     },
-    isAvailable: finalIsAvailable,
+    ...(finalIsAvailable !== undefined && { isAvailable: finalIsAvailable }),
     isArchived: false,
   }
 
