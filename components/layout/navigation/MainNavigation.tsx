@@ -20,7 +20,7 @@ export default async function MainNavigation() {
             aria-label='All Product'
             asChild
           >
-            <Link href="products">
+            <Link href="/products">
               <PackageSearch className="size-5.5" />
             </Link>
           </Button>
