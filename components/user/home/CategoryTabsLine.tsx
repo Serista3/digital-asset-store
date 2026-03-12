@@ -8,8 +8,8 @@ import Paragraph from '@/components/typography/Paragraph';
 import { getStorefrontProducts } from '@/action/product';
 import { Product, ProductCategory } from '@/types';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface CategoryTabsLineProps {
   categories: ProductCategory[];
@@ -24,6 +24,7 @@ export default function CategoryTabsLine({
   const finalCategory = category ?? firstCategory
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
 
   // Fetch product base on category param
   useEffect(() => {
@@ -53,8 +54,12 @@ export default function CategoryTabsLine({
       <div className="max-w-275 overflow-x-auto overflow-y-hidden">
         <TabsList variant="line">
           {categories.map((cat) => (
-            <TabsTrigger key={cat.id} value={cat.title} asChild>
-              <Link href={`?category=${cat.title}`}>{cat.title}</Link>
+            <TabsTrigger 
+              key={cat.id} 
+              value={cat.title} 
+              onClick={() => router.push(`?category=${cat.title}`, { scroll: false })}
+            >
+              {cat.title}
             </TabsTrigger>
           ))}
         </TabsList>

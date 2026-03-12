@@ -116,6 +116,9 @@ export const getProduct = async function (id: string,): Promise<Product | null |
       where: {
         id,
       },
+      include: {
+        category: true
+      }
     });
 
     return product;
