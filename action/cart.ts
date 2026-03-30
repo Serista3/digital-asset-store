@@ -13,10 +13,10 @@ export const getCarts = async function(){
 }
 
 // Add Product To Cart
-export const addProductToCart = async function(productId: string, pathName: string){
+export const addProductToCart = async function(productId: string){
   try {
     const { isAuthenticated } = await auth()
-    if(!isAuthenticated) throw new Error('You are not Login. Please login before add to cart.')
+    if(!isAuthenticated) throw new Error('You are not Login. Please login before add product to cart.')
     
     // User Exists
     const user = await getCurrentUser()
@@ -56,8 +56,8 @@ export const addProductToCart = async function(productId: string, pathName: stri
       });
     });
 
-    revalidatePath(pathName)
-    return { success: true, message: "Add product to cart success!!" };
+    revalidatePath('/', 'layout');
+    return { success: true, message: "Item added to your cart" };
   }catch(err){
     console.error(err);
     return errorMessage('custom', err as Error)
@@ -65,10 +65,10 @@ export const addProductToCart = async function(productId: string, pathName: stri
 }
 
 // Remove Product From Cart
-export const removeProductFromCart = async function(productId: string, pathName: string){
+export const removeProductFromCart = async function(productId: string){
   try {
     const { isAuthenticated } = await auth()
-    if(!isAuthenticated) throw new Error('You are not Login. Please login before add to cart.')
+    if(!isAuthenticated) throw new Error('You are not Login. Please login before remove product from cart.')
     
      // User Exists
     const user = await getCurrentUser()
@@ -95,8 +95,8 @@ export const removeProductFromCart = async function(productId: string, pathName:
       });
     }
 
-    revalidatePath(pathName)
-    return { success: true, message: "Remove product from cart success!!" };
+    revalidatePath('/', 'layout');
+    return { success: true, message: "Product removed from cart" };
   }catch(err){
     console.error(err);
     return errorMessage('custom', err as Error)

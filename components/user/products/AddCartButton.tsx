@@ -6,7 +6,6 @@ import { CirclePlus, CircleX } from "lucide-react";
 
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
 import { useCart } from "@/store/CartContext";
 import { addProductToCart, removeProductFromCart } from "@/action/cart";
 import { cn, showNoti } from "@/lib/utils";
@@ -17,7 +16,6 @@ interface AddCartButtonProps {
 }
 
 export default function AddCartButton({ productId, className }: AddCartButtonProps){
-  const pathName = usePathname()
   const { isSignedIn } = useAuth()
 
   const { cartItems } = useCart();
@@ -31,9 +29,9 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
 
     setIsLoading(true)
 
-    const result = await addProductToCart(productId, pathName)
+    const result = await addProductToCart(productId)
     showNoti(result);
-    
+
     setIsLoading(false)
   }
 
@@ -43,7 +41,7 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
 
     setIsLoading(true)
 
-    const result = await removeProductFromCart(productId, pathName)
+    const result = await removeProductFromCart(productId)
     showNoti(result);
 
     setIsLoading(false)
@@ -53,6 +51,7 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
     <>
       {isSignedIn && (
         <>
+          {/* Add Button */}
           {!isInCart && (
             <Button 
               className={cn("w-full z-3", className)} 
@@ -73,6 +72,8 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
               )}
             </Button>
           )}
+
+          {/* Remove Button */}
           {isInCart && (
             <Button
               className={cn("w-full z-3", className)} 
