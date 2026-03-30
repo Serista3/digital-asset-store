@@ -17,7 +17,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Card className="relative w-full max-w-125 pt-0 overflow-hidden hover:scale-101 transition-all duration-300">
       <Link href={`/products/${product.id}`} className='absolute top-0 left-0 size-full z-2' />
       <Image
-        src={product.imageUrl}
+        src={product.imageUrl || '/images/image-empty.png'}
         alt={product.title}
         width={300}
         height={300}

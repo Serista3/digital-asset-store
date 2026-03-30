@@ -19,7 +19,7 @@ export default function WideProductCard({ product, className }: WideProductCardP
       <div className="h-full w-full absolute shadow-[inset_0_-120px_60px_rgba(0,0,0,0.8)]" />
       <div className="overflow-hidden rounded-lg h-full w-full">
         <Image
-          src={product.imageUrl}
+          src={product.imageUrl || '/images/image-empty.png'}
           alt={product.title}
           width={300}
           height={300}
