@@ -90,6 +90,8 @@ export const getAdminProducts = async function (searchParams: SearchParams): Pro
   }
 
   try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
     const [products, totalItems] = await db.$transaction([
       db.product.findMany({
         where: whereConditional,

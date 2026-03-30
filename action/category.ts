@@ -22,6 +22,8 @@ export const getAdminCategories = async function(searchParams: SearchParams): Pr
   }
 
   try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
     const [data, totalItems] = await db.$transaction([
       db.productCategory.findMany({
         where: baseWhere,

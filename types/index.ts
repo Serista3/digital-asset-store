@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export type ErrorMesg = 'custom' | 'unknown'
+export type ErrorMesg = 'custom' | 'unknown';
 
 export interface ActionState<T> {
   errors?: z.core.$ZodIssue[] | undefined;
@@ -39,9 +39,9 @@ export interface User {
   name: string;
   createdAt: Date;
   updatedAt: Date;
-  orders?: Order[];
-  cart?: Cart;
-  downloads?: DownloadVerification[];
+  orders?: Order[] | null;
+  cart?: Cart | null;
+  downloads?: DownloadVerification[] | null;
 }
 
 export interface Product {
@@ -68,9 +68,24 @@ export interface ProductCategory {
   products?: Product[];
 }
 
-export interface Cart {}
+export interface Cart {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  items?: CartItem[];
+  userId: string;
+  user?: User;
+}
 
-export interface CartItem {}
+export interface CartItem {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  cartId: String;
+  cart?: Cart;
+  productId: String;
+  product?: Product;
+}
 
 export interface Order {}
 

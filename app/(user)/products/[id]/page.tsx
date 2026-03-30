@@ -78,7 +78,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
         </li>
       </ul>
       <Paragraph>{product.description}</Paragraph>
-      <AddCartButton className='w-fit' />
+      <AddCartButton className='w-fit' productId={product.id} />
 
       {/* Other Products */}
       <section className='mt-12 flex flex-col gap-8'>
