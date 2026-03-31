@@ -45,7 +45,7 @@ export default async function Cart() {
             </div>
             
             {/* Cart Summary */}
-            <CartSummary amount={items.length} totalPrice={totalPrice} />
+            <CartSummary amount={items.length} totalPrice={totalPrice} cartItems={items} />
           </div>
         )}
 

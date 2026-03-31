@@ -6,17 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { CreditCard } from "lucide-react";
 
+import { CartItem } from "@/types";
 import { formattedPrice, showNoti } from "@/lib/utils";
 import { removeAllProductFromCart } from "@/action/cart";
+import { createCheckoutSession } from "@/action/checkout"; 
 import { useCart } from "@/store/CartContext";
 import { useState } from "react";
 
 interface CartSummaryProps {
   amount: number;
   totalPrice: number;
+  cartItems: CartItem[];
 }
 
-export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
+export default function CartSummary({ amount, totalPrice, cartItems }: CartSummaryProps){
   const { removeAllCartItem } = useCart()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -34,6 +37,11 @@ export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
     showNoti(result)
   }
 
+  // Operation: Checkout
+  const handleCheckout = async function(){
+    await createCheckoutSession(totalPrice, cartItems)
+  }
+
   return (
     <div className="p-6 rounded-lg border shadow-sm flex flex-col gap-4 lg:self-start lg:sticky">
       <Heading level="3">Total Price</Heading>
@@ -48,7 +56,7 @@ export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
       </div>
       <div className="flex flex-col gap-2 mt-4">
         {/* Payment Button */}
-        <Button>
+        <Button onClick={handleCheckout}>
           <CreditCard />
           <span>Payment</span> 
         </Button>
