@@ -1,4 +1,5 @@
 import Heading from '@/components/typography/Heading';
+import AddCartButton from './AddCartButton';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 
@@ -6,7 +7,6 @@ import { formattedPrice } from '@/lib/utils';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import AddCartButton from './AddCartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -24,16 +24,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="aspect-video w-full object-cover"
       />
       <CardHeader>
-        <Heading level='4' className='z-3 w-fit'>{product.title}</Heading>
-        <Badge variant="outline" className='z-3'>{product.category?.title}</Badge>
-        <CardDescription className='z-3 w-fit'>
+        <Heading level='4'>{product.title}</Heading>
+        <Badge variant="outline">{product.category?.title}</Badge>
+        <CardDescription>
           {product.description}
         </CardDescription>
-        <div className='z-3 w-fit'>
+        <div>
           {formattedPrice(product.priceInCents)}
         </div>
       </CardHeader>
-      <CardFooter className='mt-auto'>
+      <CardFooter className='mt-auto relative z-3'>
         <AddCartButton productId={product.id} />
       </CardFooter>
     </Card>

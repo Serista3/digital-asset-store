@@ -6,10 +6,40 @@ import { errorMessage } from "@/lib/utils"
 import { auth } from "@clerk/nextjs/server"
 import { getCurrentUser } from "./user"
 import { getProduct } from "./product"
+import { Cart } from "@/types"
 
-// Fetch All Cart
-export const getCarts = async function(){
+// Fetch Current User Cart
+export const getCurrentUserCart = async function(): Promise<Cart | Error | null>{
+  try {
+    const user = await getCurrentUser()
 
+    // If no user or not login
+    if(!user) throw new Error('User not found.');
+    if(user instanceof Error) throw user;
+
+    // Query user cart
+    const cart = await db.cart.findFirst({
+      where: {
+        userId: user.id
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                category: true
+              }
+            },
+          }
+        }
+      }
+    })
+
+    return cart;
+  } catch(err) {
+    console.error(err);
+    return err as Error;
+  }
 }
 
 // Add Product To Cart
