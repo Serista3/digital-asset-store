@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {formattedPrice(product.priceInCents)}
         </div>
       </CardHeader>
-      <CardFooter>
+      <CardFooter className='mt-auto'>
         <AddCartButton productId={product.id} />
       </CardFooter>
     </Card>

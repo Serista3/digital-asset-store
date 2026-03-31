@@ -47,38 +47,46 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
         />
       </header>
 
-      {/* Banner Image */}
-      <div className='rounded-lg overflow-hidden'>
-        <Image 
-          src={product.imageUrl || '/images/image-empty.png'}
-          alt={`Image of ${product.title}`}
-          className='w-full h-50 sm:h-55 md:h-65 lg:h-75 object-cover'
-          width={400}
-          height={300}
-        />
-      </div>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+        {/* Banner Image */}
+        <div className='rounded-lg overflow-hidden'>
+          <Image 
+            src={product.imageUrl || '/images/image-empty.png'}
+            alt={`Image of ${product.title}`}
+            className='w-full h-50 sm:h-full object-cover'
+            width={400}
+            height={300}
+          />
+        </div>
+        
+        <div className='flex flex-col gap-4 border p-6 rounded-lg'>
+          {/* General Info */}
+          <ul className='flex flex-col gap-2'>
+            <li className='flex items-center gap-2'>
+              <Heading level='5'>หมวดหมู่:</Heading>
+              <span>{product.category?.title}</span>
+            </li>
+            <li className='flex items-center gap-2'>
+              <Heading level='5'>วางขายเมื่อ:</Heading>
+              <span>{formattedDateToRead(product.createdAt)}</span>
+            </li>
+            <li className='flex items-center gap-2'>
+              <Heading level='5'>แก้ไขสินค้าล่าสุด:</Heading>
+              <span>{formattedDateToRead(product.updatedAt)}</span>
+            </li>
+            <li className='flex items-center gap-2'>
+              <Heading level='5'>ราคา:</Heading>
+              <span>{formattedPrice(product.priceInCents)}</span>
+            </li>
+          </ul>
 
-      {/* General Info */}
-      <ul className='flex flex-col gap-2'>
-        <li className='flex items-center gap-2'>
-          <Heading level='5'>หมวดหมู่:</Heading>
-          <span>{product.category?.title}</span>
-        </li>
-        <li className='flex items-center gap-2'>
-          <Heading level='5'>วางขายเมื่อ:</Heading>
-          <span>{formattedDateToRead(product.createdAt)}</span>
-        </li>
-        <li className='flex items-center gap-2'>
-          <Heading level='5'>แก้ไขสินค้าล่าสุด:</Heading>
-          <span>{formattedDateToRead(product.updatedAt)}</span>
-        </li>
-        <li className='flex items-center gap-2'>
-          <Heading level='5'>ราคา:</Heading>
-          <span>{formattedPrice(product.priceInCents)}</span>
-        </li>
-      </ul>
-      <Paragraph>{product.description}</Paragraph>
-      <AddCartButton className='w-fit' productId={product.id} />
+          {/* Product Description */}
+          <Paragraph className='mb-6 sm:mb-auto'>{product.description}</Paragraph>
+
+          {/* Add Cart Btn */}
+          <AddCartButton className='w-fit' productId={product.id} />
+        </div>
+      </div>
 
       {/* Other Products */}
       <section className='mt-12 flex flex-col gap-8'>

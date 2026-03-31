@@ -9,6 +9,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useCart } from "@/store/CartContext";
 import { addProductToCart, removeProductFromCart } from "@/action/cart";
 import { cn, showNoti } from "@/lib/utils";
+import { CartItem } from "@/types";
 
 interface AddCartButtonProps {
   productId: string;
@@ -18,7 +19,7 @@ interface AddCartButtonProps {
 export default function AddCartButton({ productId, className }: AddCartButtonProps){
   const { isSignedIn } = useAuth()
 
-  const { cartItems } = useCart();
+  const { cartItems, addCartItem, removeCartItem } = useCart();
   const isInCart = cartItems.some(pc => pc.productId === productId)
 
   const [isLoading, setIsLoading] = useState(false)
@@ -32,6 +33,8 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
     const result = await addProductToCart(productId)
     showNoti(result);
 
+    addCartItem({ productId } as unknown as CartItem)
+
     setIsLoading(false)
   }
 
@@ -43,6 +46,8 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
 
     const result = await removeProductFromCart(productId)
     showNoti(result);
+
+    removeCartItem(productId);
 
     setIsLoading(false)
   }
