@@ -58,5 +58,8 @@ export const formattedDateToRead = function(date: Date){
 
 // Formatted Price
 export const formattedPrice = function(price: number){
-  return (price / 100).toFixed(2) + ' THB'
+  return (price / 100).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " THB"
 }
