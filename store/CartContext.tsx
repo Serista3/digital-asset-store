@@ -7,6 +7,7 @@ interface CartContextType {
   cartItems: CartItem[];
   addCartItem: (item: CartItem) => void;
   removeCartItem: (productId: string) => void;
+  removeAllCartItem: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -36,8 +37,12 @@ export function CartProvider({ children, initialItems = [] }: {
     );
   };
 
+  const removeAllCartItem = () => {
+    setCartItems([]);
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addCartItem, removeCartItem }}>
+    <CartContext.Provider value={{ cartItems, addCartItem, removeCartItem, removeAllCartItem }}>
       {children}
     </CartContext.Provider>
   );

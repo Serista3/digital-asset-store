@@ -135,5 +135,26 @@ export const removeProductFromCart = async function(productId: string){
 
 // Remove All Product From Cart
 export const removeAllProductFromCart = async function(){
+  try {
+    const user = await getCurrentUser()
 
+    // If no user or not login
+    if(!user) throw new Error('User not found.');
+    if(user instanceof Error) throw user;
+
+    // Delete all cart item
+    await db.cartItem.deleteMany({
+      where: {
+        cart: {
+          userId: user.id
+        }
+      },
+    })
+
+    revalidatePath('/cart');
+    return { success: true, message: "All product removed from cart" };
+  } catch(err) {
+    console.error(err);
+    return errorMessage('custom', err as Error)
+  }
 }

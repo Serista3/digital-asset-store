@@ -81,9 +81,9 @@ export interface CartItem {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  cartId: String;
+  cartId: string;
   cart?: Cart;
-  productId: String;
+  productId: string;
   product?: Product;
 }
 
