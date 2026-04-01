@@ -87,3 +87,26 @@ export const editProductSchema = productSchema.extend({
   imageUrl: productSchema.shape.imageUrl.optional(),
   fileUrl: productSchema.shape.fileUrl.optional(),
 });
+
+// Search Params Schema
+export const searchParamsSchema = z.object({
+  searchTerm: z.string().trim().optional().default(''),
+  skip: z.coerce.number().int().min(0).default(0),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+})
+
+// Product Search Params Schema
+export const productSearchParamsSchema = z.object({
+  sortBy: z.enum(['price_desc', 'price_asc', 'title_desc', 'title_asc', 'newest']).default('newest'),
+  title: z.string().trim().toLowerCase().optional().catch(''),
+  category: z.string().trim().optional().catch(''),
+  price_gte: z.coerce.number().catch(0),
+  price_lte: z.coerce.number().catch(1000000),
+  isAvailable: z.enum(['true', 'false']).optional(),
+});
+
+// Product Id Schema
+export const productIdSchema = z.string().min(1, 'Product ID is required');
+
+// Product Category Id Schema
+export const productCategoryIdSchema = z.string().min(1, 'Product Category ID is required');

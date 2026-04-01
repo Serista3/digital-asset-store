@@ -87,6 +87,46 @@ export interface CartItem {
   product?: Product;
 }
 
-export interface Order {}
+enum OrderStatus {
+  PENDING,
+  PAID,
+  CANCELLED,
+}
 
-export interface DownloadVerification {}
+export interface Order {
+  id: string;
+  status: OrderStatus;
+  totalPriceInCents: number;
+  stripeSessionId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  items?: OrderItem[];
+  userId: string;
+  user?: User;
+  downloadVerifications?: DownloadVerification[];
+}
+
+export interface OrderItem {
+  id: string;
+  title: string;
+  description?: string;
+  priceInCents: number;
+  imageUrl: string;
+  fileUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+  orderId: String;
+  order?: Order;
+}
+
+export interface DownloadVerification {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  user?: User;
+  productId: string;
+  product?: Product;
+  orderId: string;
+  order?: Order;
+}

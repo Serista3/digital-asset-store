@@ -2,7 +2,7 @@
 
 import db from '@/lib/db';
 import { ActionState, Product, ProductSearchParams, ResultItems, SearchParams } from '@/types';
-import { editProductSchema, ProductFormData, productSchema, validateFormData } from '@/lib/validations';
+import { editProductSchema, ProductFormData, productIdSchema, productSchema, productSearchParamsSchema, searchParamsSchema, validateFormData } from '@/lib/validations';
 import { redirect } from 'next/navigation';
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from '@/lib/utils';
 import { isAdminUser } from './user';
@@ -12,52 +12,36 @@ import { Prisma } from '@prisma/client';
 
 // Fetch products for storefront
 export const getStorefrontProducts = async function(searchParams: ProductSearchParams){
-  const { skip, limit } = prepareBaseQueryInfo(searchParams)
-
-  // Order by
-  let orderByCondition: Prisma.ProductOrderByWithRelationInput = { 
-    createdAt: 'desc'
-  };
-
-  if (searchParams.sortBy === 'price_desc') {
-    orderByCondition = { priceInCents: 'desc' };
-  }else if (searchParams.sortBy === 'price_asc') {
-    orderByCondition = { priceInCents: 'asc' };
-  }else if (searchParams.sortBy === 'title_desc') {
-    orderByCondition = { title: 'desc' };
-  }else if (searchParams.sortBy === 'title_asc') {
-    orderByCondition = { title: 'asc' };
-  }
-
-  // Filter by
-  const finalTitle = searchParams.title?.toLocaleLowerCase().trim() || ''
-  const finalCategory = searchParams.category?.trim() || ''
-  const finalPriceGte = Number(searchParams.price_gte ?? 0) * 100
-  const finalPriceIte = Number(searchParams.price_lte ?? 1000000) * 100
-
-  const isAvailableParam = searchParams.isAvailable;
-  const finalIsAvailable = isAvailableParam === 'true' ? true : undefined;
-
-  const whereConditional: Prisma.ProductWhereInput = {
-    category: {
-      title: {
-        contains: finalCategory,
-        mode: 'insensitive'
-      }
-    },
-    title: {
-      contains: finalTitle,
-      mode: 'insensitive'
-    },
-    priceInCents: {
-      gte: finalPriceGte,
-      lte: finalPriceIte
-    },
-    ...(finalIsAvailable !== undefined && { isAvailable: finalIsAvailable }),
-    isArchived: false,
-  }
-
   try {
+    const { skip, limit } = prepareBaseQueryInfo(searchParams)
+
+    // Validation Product Search Params
+    const validation = validateFormData(productSearchParamsSchema, searchParams);
+    if (!validation.success || !validation.data) throw new Error("Invalid search parameters");
+
+    const { sortBy, title, category, price_gte, price_lte, isAvailable } = validation.data;
+
+    // Order by
+    let orderByCondition: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' };
+    if (sortBy === 'price_desc') orderByCondition = { priceInCents: 'desc' };
+    else if (sortBy === 'price_asc') orderByCondition = { priceInCents: 'asc' };
+    else if (sortBy === 'title_desc') orderByCondition = { title: 'desc' };
+    else if (sortBy === 'title_asc') orderByCondition = { title: 'asc' };
+
+    const whereConditional: Prisma.ProductWhereInput = {
+      category: {
+        title: { contains: category, mode: 'insensitive' }
+      },
+      title: { contains: title, mode: 'insensitive' },
+      priceInCents: {
+        gte: price_gte * 100,
+        lte: price_lte * 100
+      },
+      ...(isAvailable === 'true' && { isAvailable: true }),
+      isArchived: false,
+    }
+
+    // Query products
     const [products, totalItems] = await db.$transaction([
       db.product.findMany({
         where: whereConditional,
@@ -79,18 +63,24 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
 
 // Fetch admin products
 export const getAdminProducts = async function (searchParams: SearchParams): Promise<ResultItems<Product>> {
-  const { searchTerm, skip, limit } = prepareBaseQueryInfo(searchParams)
-
-  const whereConditional: Prisma.ProductWhereInput = {
-    title: {
-      contains: searchTerm,
-      mode: 'insensitive',
-    },
-    isArchived: false
-  }
-
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    const { searchTerm: rawSearchTerm, skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
+
+    // Validation Search Params
+    const validation = validateFormData(searchParamsSchema, { searchTerm: rawSearchTerm, skip: rawSkip, limit: rawLimit })
+    if (!validation.success || !validation.data) throw new Error('Invalid search parameters')
+    
+    const { searchTerm, skip, limit } = validation.data
+
+    const whereConditional: Prisma.ProductWhereInput = {
+      title: {
+        contains: searchTerm,
+        mode: 'insensitive',
+      },
+      isArchived: false
+    }
 
     const [products, totalItems] = await db.$transaction([
       db.product.findMany({
@@ -112,8 +102,17 @@ export const getAdminProducts = async function (searchParams: SearchParams): Pro
 };
 
 // Fetch product detail
-export const getProduct = async function (id: string,): Promise<Product | null | Error> {
+export const getProduct = async function (rawProductId: unknown): Promise<Product | null | Error> {
   try {
+    // Validation ID
+    const validationId = validateFormData(productIdSchema, rawProductId)
+
+    if (!validationId.success) throw new Error('Invalid product ID format')
+    if (!validationId.data) throw new Error('Product id is required')
+    
+    // Safe Product Id
+    const id = validationId.data
+
     const product = await db.product.findFirst({
       where: {
         id,
@@ -199,7 +198,7 @@ export const createProduct = async function (
 
 // Update product
 export const updateProduct = async function (
-  id: string,
+  rawProductId: unknown,
   state: ActionState<ProductFormData>,
   formData: FormData,
 ): Promise<ActionState<ProductFormData>> {
@@ -207,6 +206,15 @@ export const updateProduct = async function (
 
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation ID
+    const validationId = validateFormData(productIdSchema, rawProductId)
+
+    if (!validationId.success) throw new Error('Invalid product ID format')
+    if (!validationId.data) throw new Error('Product id is required')
+    
+    // Safe Product Id
+    const id = validationId.data
 
     const product = await getProduct(id)
 
@@ -231,7 +239,7 @@ export const updateProduct = async function (
       categoryId: String(data.categoryId),
     };
 
-    // Validation
+    // Validation Form Data
     const validationData: Record<string, unknown> = {
       ...data,
       isAvailable,
@@ -296,9 +304,18 @@ export const updateProduct = async function (
 };
 
 // Delete product
-export const deleteProduct = async function(id: string){
+export const deleteProduct = async function(rawProductId: unknown){
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation Id
+    const validation = validateFormData(productIdSchema, rawProductId)
+
+    if (!validation.success) throw new Error('Invalid product ID format')
+    if (!validation.data) throw new Error('Product id is required')
+    
+    // Safe Product Id
+    const id = validation.data
 
     // Save result in DB
     await db.product.update({

@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from "@/lib/utils";
-import { ProductCategoryFormData, productCategorySchema, validateFormData } from "@/lib/validations";
+import { ProductCategoryFormData, productCategoryIdSchema, productCategorySchema, searchParamsSchema, validateFormData } from "@/lib/validations";
 import { ActionState, ProductCategory, ResultItems, SearchParams } from "@/types";
 
 import { revalidatePath } from "next/cache";
@@ -12,17 +12,23 @@ import { Prisma } from "@prisma/client";
 
 // Fetch categories for admin
 export const getAdminCategories = async function(searchParams: SearchParams): Promise<ResultItems<ProductCategory>>{
-  const { searchTerm, skip, limit } = prepareBaseQueryInfo(searchParams)
-
-  const baseWhere: Prisma.ProductCategoryWhereInput = {
-    title: {
-      contains: searchTerm,
-      mode: "insensitive",
-    },
-  }
-
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    const { searchTerm: rawSearchTerm, skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
+
+    // Validation Search Params
+    const validation = validateFormData(searchParamsSchema, { searchTerm: rawSearchTerm, skip: rawSkip, limit: rawLimit })
+    if (!validation.success || !validation.data) throw new Error('Invalid search parameters')
+    
+    const { searchTerm, skip, limit } = validation.data
+
+    const baseWhere: Prisma.ProductCategoryWhereInput = {
+      title: {
+        contains: searchTerm,
+        mode: "insensitive",
+      },
+    }
 
     const [data, totalItems] = await db.$transaction([
       db.productCategory.findMany({
@@ -84,8 +90,17 @@ export const getStorefrontCategories = async () => {
 }
 
 // Fetch product category detail
-export const getProductCategory = async function (id: string): Promise<ProductCategory | null | Error> {
+export const getProductCategory = async function (rawCategoryId: unknown): Promise<ProductCategory | null | Error> {
   try {
+    // Validation ID
+    const validation = validateFormData(productCategoryIdSchema, rawCategoryId)
+
+    if (!validation.success) throw new Error('Invalid product ID format')
+    if (!validation.data) throw new Error('Product Category id is required')
+    
+    // Safe Product Category Id
+    const id = validation.data
+
     const productCategory = await db.productCategory.findFirst({
       where: {
         id,
@@ -138,7 +153,7 @@ export const createProductCategory = async function (
 
 // Update product category
 export const updateProductCategory = async function (
-  id: string,
+  rawCategoryId: unknown,
   state: ActionState<ProductCategoryFormData>,
   formData: FormData,
 ): Promise<ActionState<ProductCategoryFormData>> {
@@ -147,12 +162,21 @@ export const updateProductCategory = async function (
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
 
+    // Validation ID
+    const validationId = validateFormData(productCategoryIdSchema, rawCategoryId)
+
+    if (!validationId.success) throw new Error('Invalid product ID format')
+    if (!validationId.data) throw new Error('Product Category id is required')
+    
+    // Safe Product Category Id
+    const id = validationId.data
+
     const title = formData.get("title");
     const oldFormData = {
       title: String(formData.get("title") || '')
     }
 
-    // Validation
+    // Validation Form Data
     const validation = validateFormData(productCategorySchema, { title });
     
     if (!validation.success)
@@ -179,9 +203,18 @@ export const updateProductCategory = async function (
 };
 
 // Delete product category
-export const deleteProductCategory = async function (id: string) {
+export const deleteProductCategory = async function (rawCategoryId: unknown) {
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation ID
+    const validation = validateFormData(productCategoryIdSchema, rawCategoryId)
+
+    if (!validation.success) throw new Error('Invalid product ID format')
+    if (!validation.data) throw new Error('Product Category id is required')
+    
+    // Safe Product Category Id
+    const id = validation.data
 
     await db.productCategory.delete({
       where: {

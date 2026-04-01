@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server"
 import { getCurrentUser } from "./user"
 import { getProduct } from "./product"
 import { Cart } from "@/types"
+import { productIdSchema, validateFormData } from "@/lib/validations"
 
 // Fetch Current User Cart
 export const getCurrentUserCart = async function(): Promise<Cart | Error | null>{
@@ -43,10 +44,19 @@ export const getCurrentUserCart = async function(): Promise<Cart | Error | null>
 }
 
 // Add Product To Cart
-export const addProductToCart = async function(productId: string){
+export const addProductToCart = async function(rawProductId: unknown){
   try {
     const { isAuthenticated } = await auth()
     if(!isAuthenticated) throw new Error('You are not Login. Please login before add product to cart.')
+
+    // Validation Id
+    const validationId = validateFormData(productIdSchema, rawProductId)
+
+    if (!validationId.success) throw new Error('Invalid product ID format')
+    if (!validationId.data) throw new Error('Product id is required')
+    
+    // Safe Product Id
+    const productId = validationId.data
     
     // User Exists
     const user = await getCurrentUser()
@@ -95,10 +105,19 @@ export const addProductToCart = async function(productId: string){
 }
 
 // Remove Product From Cart
-export const removeProductFromCart = async function(productId: string){
+export const removeProductFromCart = async function(rawProductId: unknown){
   try {
     const { isAuthenticated } = await auth()
     if(!isAuthenticated) throw new Error('You are not Login. Please login before remove product from cart.')
+    
+    // Validation Id
+    const validationId = validateFormData(productIdSchema, rawProductId)
+
+    if (!validationId.success) throw new Error('Invalid product ID format')
+    if (!validationId.data) throw new Error('Product id is required')
+    
+    // Safe Product Id
+    const productId = validationId.data
     
      // User Exists
     const user = await getCurrentUser()

@@ -115,7 +115,7 @@ export default function FilterControls({ categories }: FilterControlsProps) {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value="title_asc">A-Z</SelectItem>
-                  <SelectItem value="title_dsc">Z-A</SelectItem>
+                  <SelectItem value="title_desc">Z-A</SelectItem>
                   <SelectItem value="price_desc">
                     Price (High to Low)
                   </SelectItem>
