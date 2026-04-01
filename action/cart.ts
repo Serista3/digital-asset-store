@@ -67,6 +67,7 @@ export const addProductToCart = async function(rawProductId: unknown){
     const product = await getProduct(productId);
     if(!product) throw new Error('Product not found.');
     if(product instanceof Error) throw product;
+    if(!product.isAvailable) throw new Error('This product is currently unavailable and cannot be added to your cart.');
 
     await db.$transaction(async (tx) => {
       // If user doesn't have cart then create new

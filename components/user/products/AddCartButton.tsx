@@ -33,7 +33,7 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
     const result = await addProductToCart(productId)
     showNoti(result);
 
-    addCartItem({ productId } as unknown as CartItem)
+    if(result.success) addCartItem({ productId } as unknown as CartItem)
 
     setIsLoading(false)
   }
@@ -47,7 +47,7 @@ export default function AddCartButton({ productId, className }: AddCartButtonPro
     const result = await removeProductFromCart(productId)
     showNoti(result);
 
-    removeCartItem(productId);
+    if(result.success) removeCartItem(productId);
 
     setIsLoading(false)
   }

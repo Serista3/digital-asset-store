@@ -4,6 +4,7 @@ import ProductCard from '@/components/user/products/ProductCard';
 import AddCartButton from '@/components/user/products/AddCartButton';
 import AlertDestructive from '@/components/admin/AlertDestructive';
 import BasicBreadcrumb from '@/components/common/BasicBreadcrumb';
+import { Button } from '@/components/ui/button';
 import { MoveRight } from 'lucide-react';
 
 import Link from 'next/link';
@@ -84,7 +85,10 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
           <Paragraph className='mb-6 sm:mb-auto'>{product.description}</Paragraph>
 
           {/* Add Cart Btn */}
-          <AddCartButton className='w-fit' productId={product.id} />
+          {product.isAvailable && <AddCartButton className='w-fit' productId={product.id} />}
+
+          {/* Not Available Btn */}
+          {!product.isAvailable && <Button disabled className='w-fit'>Not Available</Button>}
         </div>
       </div>
 

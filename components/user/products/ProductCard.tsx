@@ -1,6 +1,7 @@
 import Heading from '@/components/typography/Heading';
 import AddCartButton from './AddCartButton';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 
 import { formattedPrice } from '@/lib/utils';
@@ -34,7 +35,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardHeader>
       <CardFooter className='mt-auto relative z-3'>
-        <AddCartButton productId={product.id} />
+        {product.isAvailable && <AddCartButton productId={product.id} />}
+        {!product.isAvailable && <Button disabled>Not Available</Button>}
       </CardFooter>
     </Card>
   );
