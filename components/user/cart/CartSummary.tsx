@@ -21,7 +21,9 @@ interface CartSummaryProps {
 
 export default function CartSummary({ amount, totalPrice, cartItems }: CartSummaryProps){
   const { removeAllCartItem } = useCart()
+  
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckoutLoading, setCheckoutLoading] = useState(false)
 
   // Delete all cart item
   const handleDelAllCartItem = async function(){
@@ -39,7 +41,14 @@ export default function CartSummary({ amount, totalPrice, cartItems }: CartSumma
 
   // Operation: Checkout
   const handleCheckout = async function(){
-    await createCheckoutSession(totalPrice, cartItems)
+    setCheckoutLoading(true)
+
+    const result = await createCheckoutSession(cartItems)
+
+    if(result) {
+      showNoti(result)
+      setCheckoutLoading(false)
+    } 
   }
 
   return (
@@ -56,9 +65,17 @@ export default function CartSummary({ amount, totalPrice, cartItems }: CartSumma
       </div>
       <div className="flex flex-col gap-2 mt-4">
         {/* Payment Button */}
-        <Button onClick={handleCheckout}>
+        <Button onClick={handleCheckout} disabled={isCheckoutLoading}>
           <CreditCard />
-          <span>Payment</span> 
+            {isCheckoutLoading 
+              ? (
+                  <>
+                    <Spinner />
+                    <span>Paymenting...</span>
+                  </>
+              )
+              : <span>Payment</span> 
+            }
         </Button>
 
         {/* Remove All CartItem Button */}

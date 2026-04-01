@@ -5,9 +5,10 @@ import { stripe } from "@/lib/stripe"
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "./user"
 import { errorMessage } from "@/lib/utils"
-import { CartItem } from "@/types"
+import { checkoutSchema, validateFormData } from "@/lib/validations"
+import { removeAllProductFromCart } from "./cart"
 
-export const createCheckoutSession = async function(totalPriceInCents: number, cartItems: CartItem[]){
+export const createCheckoutSession = async function(cartItems: { productId: string }[]){
   let checkoutUrl: string | null = null;
 
   try {
@@ -17,11 +18,42 @@ export const createCheckoutSession = async function(totalPriceInCents: number, c
     if(!user) throw new Error('User not found.');
     if(user instanceof Error) throw user;
 
+    // Validation CartItem Param
+    const validationParam = validateFormData(checkoutSchema, { cartItems })
+    if (!validationParam.success || !validationParam.data) throw new Error("Invalid cart data")
+    
+    const validParamData = validationParam.data
+    const productIds = validParamData.cartItems.map(item => item.productId);
+
+    // Fetch Products
+    const products = await db.product.findMany({
+      where: { id: { in: productIds } }
+    });
+
+    if (products.length === 0) throw new Error("Products not found");
+
+    // Calculate Total Price
+    let calculatedTotalPrice = 0;
+    const orderItemsData = products.map((product) => {
+      calculatedTotalPrice += product.priceInCents;
+      
+      return {
+        title: product.title,
+        description: product.description,
+        priceInCents: product.priceInCents,
+        imageUrl: product.imageUrl,
+        fileUrl: product.fileUrl,
+      };
+    });
+
     // Create order with pending status
     const order = await db.order.create({
       data: {
         userId: user.id,
-        totalPriceInCents,
+        totalPriceInCents: calculatedTotalPrice,
+        items: {
+          create: orderItemsData
+        }
       }
     });
 
@@ -36,7 +68,7 @@ export const createCheckoutSession = async function(totalPriceInCents: number, c
             product_data: {
               name: `Order #${order.id.slice(0, 8)}`,
             },
-            unit_amount: totalPriceInCents,
+            unit_amount: calculatedTotalPrice,
           },
           quantity: 1,
         },
@@ -56,6 +88,9 @@ export const createCheckoutSession = async function(totalPriceInCents: number, c
       });
       checkoutUrl = session.url;
     }
+
+    // Remove All Cart
+    await removeAllProductFromCart()
 
   } catch(err) {
     console.error(err);
