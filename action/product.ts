@@ -13,13 +13,13 @@ import { Prisma } from '@prisma/client';
 // Fetch products for storefront
 export const getStorefrontProducts = async function(searchParams: ProductSearchParams){
   try {
-    const { skip, limit } = prepareBaseQueryInfo(searchParams)
+    const { skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
 
     // Validation Product Search Params
-    const validation = validateFormData(productSearchParamsSchema, searchParams);
+    const validation = validateFormData(productSearchParamsSchema, { ...searchParams, skip: rawSkip, limit: rawLimit });
     if (!validation.success || !validation.data) throw new Error("Invalid search parameters");
 
-    const { sortBy, title, category, price_gte, price_lte, isAvailable } = validation.data;
+    const { sortBy, title, category, price_gte, price_lte, isAvailable, skip, limit } = validation.data;
 
     // Order by
     let orderByCondition: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' };

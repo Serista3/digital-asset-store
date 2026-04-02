@@ -27,7 +27,7 @@ export default async function Cart() {
 
   return (
     <div className="flex flex-col gap-10">
-      <Heading>Carts</Heading>
+      <Heading>Cart</Heading>
 
       {/* Cart Content */}
       <div className="flex flex-col gap-4">

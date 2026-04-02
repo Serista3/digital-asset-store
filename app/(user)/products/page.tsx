@@ -32,8 +32,8 @@ export default async function Products({ searchParams }: { searchParams: Promise
                 <div className='lg:col-span-2'>
                     {/* Heading */}
                     <div className='flex gap-2 items-end mb-8'>
-                        <Heading level='3'>Result</Heading>
-                        <Paragraph>({products.totalItems} items)</Paragraph>
+                        <Heading level='3'>Result{products.totalItems !== 1 && 's'}</Heading>
+                        <Paragraph>({products.totalItems} item{products.totalItems !== 1 && 's'})</Paragraph>
                     </div>
 
                     {/* Products */}

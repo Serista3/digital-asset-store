@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { OrderStatus } from '@prisma/client';
 
 // Validation
 export const validateFormData = function <T>(
@@ -96,7 +97,7 @@ export const searchParamsSchema = z.object({
 })
 
 // Product Search Params Schema
-export const productSearchParamsSchema = z.object({
+export const productSearchParamsSchema = searchParamsSchema.extend({
   sortBy: z.enum(['price_desc', 'price_asc', 'title_desc', 'title_asc', 'newest']).default('newest'),
   title: z.string().trim().toLowerCase().optional().catch(''),
   category: z.string().trim().optional().catch(''),
@@ -113,3 +114,8 @@ export const productCategoryIdSchema = z.string().min(1, 'Product Category ID is
 
 // Stripe Session Id Schema
 export const stripeSessionIdSchema = z.string().min(1, 'Stripe Session ID is required');
+
+// Order Search Params Schema
+export const orderSearchParamsSchema = searchParamsSchema.extend({
+  status: z.enum(OrderStatus).default(OrderStatus.PENDING),
+})

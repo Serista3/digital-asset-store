@@ -1,4 +1,5 @@
 import z from 'zod';
+import { OrderStatus } from '@prisma/client';
 
 export type ErrorMesg = 'custom' | 'unknown';
 
@@ -30,6 +31,10 @@ export interface ProductSearchParams extends SearchParams {
   price_gte?: string;
   price_lte?: string;
   isAvailable?: string;
+}
+
+export interface OrderSearchParams extends SearchParams {
+  status?: OrderStatus;
 }
 
 export interface User {
@@ -85,12 +90,6 @@ export interface CartItem {
   cart?: Cart;
   productId: string;
   product?: Product;
-}
-
-enum OrderStatus {
-  PENDING,
-  PAID,
-  CANCELLED,
 }
 
 export interface Order {
