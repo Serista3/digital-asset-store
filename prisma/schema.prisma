@@ -52,6 +52,7 @@ model Product {
   category              ProductCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   cartItems             CartItem[]
   downloadVerifications DownloadVerification[]
+  orderItems            OrderItem[]
 }
 
 model Cart {
@@ -104,8 +105,10 @@ model OrderItem {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 }
 
 model DownloadVerification {

@@ -5,10 +5,9 @@ import { stripe } from "@/lib/stripe"
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "./user"
 import { errorMessage } from "@/lib/utils"
-import { checkoutSchema, validateFormData } from "@/lib/validations"
 import { removeAllProductFromCart } from "./cart"
 
-export const createCheckoutSession = async function(cartItems: { productId: string }[]){
+export const createCheckoutSession = async function(){
   let checkoutUrl: string | null = null;
 
   try {
@@ -18,24 +17,26 @@ export const createCheckoutSession = async function(cartItems: { productId: stri
     if(!user) throw new Error('User not found.');
     if(user instanceof Error) throw user;
 
-    // Validation CartItem Param
-    const validationParam = validateFormData(checkoutSchema, { cartItems })
-    if (!validationParam.success || !validationParam.data) throw new Error("Invalid cart data")
+    // User Cart Exists
+    if(!user.cart || !user.cart.items || user.cart.items.length === 0) throw new Error('Your cart is empty')
     
-    const validParamData = validationParam.data
-    const productIds = validParamData.cartItems.map(item => item.productId);
+    const productIds = user.cart.items.map(item => item.productId);
 
     // Fetch Products
     const products = await db.product.findMany({
-      where: { id: { in: productIds } }
+      where: { 
+        id: { 
+          in: productIds 
+        } 
+      }
     });
 
     if (products.length === 0) throw new Error("Products not found");
 
     // Calculate Total Price
-    let calculatedTotalPrice = 0;
+    let calcTotalPrice = 0;
     const orderItemsData = products.map((product) => {
-      calculatedTotalPrice += product.priceInCents;
+      calcTotalPrice += product.priceInCents;
       
       return {
         title: product.title,
@@ -43,6 +44,7 @@ export const createCheckoutSession = async function(cartItems: { productId: stri
         priceInCents: product.priceInCents,
         imageUrl: product.imageUrl,
         fileUrl: product.fileUrl,
+        productId: product.id
       };
     });
 
@@ -50,7 +52,7 @@ export const createCheckoutSession = async function(cartItems: { productId: stri
     const order = await db.order.create({
       data: {
         userId: user.id,
-        totalPriceInCents: calculatedTotalPrice,
+        totalPriceInCents: calcTotalPrice,
         items: {
           create: orderItemsData
         }
@@ -68,7 +70,7 @@ export const createCheckoutSession = async function(cartItems: { productId: stri
             product_data: {
               name: `Order #${order.id.slice(0, 8)}`,
             },
-            unit_amount: calculatedTotalPrice,
+            unit_amount: calcTotalPrice,
           },
           quantity: 1,
         },
@@ -83,8 +85,12 @@ export const createCheckoutSession = async function(cartItems: { productId: stri
     // Update strip session id
     if (session.url) {
       await db.order.update({
-        where: { id: order.id },
-        data: { stripeSessionId: session.id },
+        where: { 
+          id: order.id 
+        },
+        data: { 
+          stripeSessionId: session.id 
+        },
       });
       checkoutUrl = session.url;
     }

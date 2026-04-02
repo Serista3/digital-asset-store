@@ -110,12 +110,3 @@ export const productIdSchema = z.string().min(1, 'Product ID is required');
 
 // Product Category Id Schema
 export const productCategoryIdSchema = z.string().min(1, 'Product Category ID is required');
-
-// Checkout Schema
-export const checkoutSchema = z.object({
-  cartItems: z.array(
-    z.object({
-      productId: z.string().min(1, "Product ID is required"),
-    })
-  ).min(1, "Cart is empty")
-})

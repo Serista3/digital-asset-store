@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { CreditCard } from "lucide-react";
 
-import { CartItem } from "@/types";
 import { formattedPrice, showNoti } from "@/lib/utils";
 import { removeAllProductFromCart } from "@/action/cart";
 import { createCheckoutSession } from "@/action/checkout"; 
@@ -16,10 +15,9 @@ import { useState } from "react";
 interface CartSummaryProps {
   amount: number;
   totalPrice: number;
-  cartItems: CartItem[];
 }
 
-export default function CartSummary({ amount, totalPrice, cartItems }: CartSummaryProps){
+export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
   const { removeAllCartItem } = useCart()
   
   const [isLoading, setIsLoading] = useState(false)
@@ -43,7 +41,7 @@ export default function CartSummary({ amount, totalPrice, cartItems }: CartSumma
   const handleCheckout = async function(){
     setCheckoutLoading(true)
 
-    const result = await createCheckoutSession(cartItems)
+    const result = await createCheckoutSession()
 
     if(result) {
       showNoti(result)
