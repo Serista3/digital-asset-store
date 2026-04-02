@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         // Update status order to PAID
         await db.order.update({
           where: { 
-            id: orderId 
+            id: order.id 
           },
           data: { 
             status: 'PAID',
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
           });
         }
 
-        console.log(`✅ ชำระเงินสำเร็จ! อัปเดตออเดอร์ ${orderId} เรียบร้อยแล้ว`);
+        console.log(`✅ ชำระเงินสำเร็จ! อัปเดตออเดอร์ ${order.id} เรียบร้อยแล้ว`);
       } catch (error) {
         console.error("❌ อัปเดตออเดอร์ไม่สำเร็จ:", error);
         return new NextResponse("Database Error", { status: 500 });

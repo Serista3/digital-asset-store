@@ -64,16 +64,20 @@ export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
       <div className="flex flex-col gap-2 mt-4">
         {/* Payment Button */}
         <Button onClick={handleCheckout} disabled={isCheckoutLoading}>
-          <CreditCard />
-            {isCheckoutLoading 
-              ? (
-                  <>
-                    <Spinner />
-                    <span>Paymenting...</span>
-                  </>
-              )
-              : <span>Payment</span> 
-            }
+          {isCheckoutLoading 
+            ? (
+              <>
+                <Spinner />
+                <span>Paymenting...</span>
+              </>
+            )
+            : (
+              <>
+                <CreditCard />
+                <span>Payment</span> 
+              </>
+            )
+          }
         </Button>
 
         {/* Remove All CartItem Button */}
