@@ -110,3 +110,6 @@ export const productIdSchema = z.string().min(1, 'Product ID is required');
 
 // Product Category Id Schema
 export const productCategoryIdSchema = z.string().min(1, 'Product Category ID is required');
+
+// Stripe Session Id Schema
+export const stripeSessionIdSchema = z.string().min(1, 'Stripe Session ID is required');

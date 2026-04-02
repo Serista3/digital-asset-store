@@ -82,7 +82,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
           </ul>
 
           {/* Product Description */}
-          <Paragraph className='mb-6 sm:mb-auto'>{product.description}</Paragraph>
+          <Paragraph className='mb-6 sm:mb-auto text-gray-600'>{product.description}</Paragraph>
 
           {/* Add Cart Btn */}
           {product.isAvailable && <AddCartButton className='w-fit' productId={product.id} />}

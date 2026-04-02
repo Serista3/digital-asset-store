@@ -7,6 +7,7 @@ import { getCurrentUser } from "./user"
 import { errorMessage } from "@/lib/utils"
 import { removeAllProductFromCart } from "./cart"
 
+// Create Checkout Session
 export const createCheckoutSession = async function(){
   let checkoutUrl: string | null = null;
 
