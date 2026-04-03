@@ -1,4 +1,4 @@
-import { Inter, IBM_Plex_Sans_Thai } from 'next/font/google';
+import { Inter, IBM_Plex_Sans_Thai, Kanit } from 'next/font/google';
 
 export const inter = Inter({
   weight: ['400'],
@@ -7,5 +7,6 @@ export const inter = Inter({
 
 export const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   weight: ['400'],
-  subsets: ['thai'],
+  subsets: ['thai', 'latin'],
+  display: 'swap',
 });

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { CartProvider } from '@/store/CartContext';
-import { inter } from '../fonts';
+import { ibmPlexSansThai } from '../fonts';
 import { getCurrentUser } from '@/action/user';
 
 import MainNavigation from '@/components/layout/navigation/MainNavigation';
@@ -30,7 +30,7 @@ export default async function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.className} antialiased`}>
+        <body className={`${ibmPlexSansThai.className} antialiased`}>
           <Providers color='#000'>
             <CartProvider initialItems={initialCartItems}>
               <MainNavigation />
