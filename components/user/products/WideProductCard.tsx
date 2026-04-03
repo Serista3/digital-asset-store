@@ -5,7 +5,7 @@ import { Card, CardFooter, CardHeader } from '@/components/ui/card';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Product } from '@/types';
+import { Product } from '@prisma/client';
 import { cn } from '@/lib/utils';
 
 interface WideProductCardProps {

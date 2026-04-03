@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 
 import { formattedPrice } from '@/lib/utils';
-import { Product } from '@/types';
+import { ProductWithCategory } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductWithCategory;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {

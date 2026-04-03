@@ -1,4 +1,4 @@
-import { ProductCategory } from '@/types';
+import { ProductCategoryWithProducts } from '@/types';
 import { Library, MoreHorizontalIcon } from 'lucide-react';
 import EmptyStorage from '../EmptyStorage';
 import {
@@ -22,7 +22,7 @@ import { LIMIT_RESULT } from '@/action/constants';
 import { formattedDateToRead } from '@/lib/utils';
 
 interface CategoryTableProps {
-  productCategories: ProductCategory[];
+  productCategories: ProductCategoryWithProducts[];
   page?: number;
 }
 

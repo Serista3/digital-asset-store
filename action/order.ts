@@ -1,14 +1,14 @@
 'use server'
 
 import db from "@/lib/db"
-import { Prisma } from "@prisma/client";
+import { Prisma, Order } from "@prisma/client";
 import { getCurrentUser } from "./user";
 import { calTotalPages, prepareBaseQueryInfo } from "@/lib/utils";
 import { orderSearchParamsSchema, stripeSessionIdSchema, validateFormData } from "@/lib/validations";
-import { OrderSearchParams } from "@/types";
+import { OrderSearchParams, OrderWithItems, ResultItems } from "@/types";
 
 // Fetch order by stripe session id
-export const getOrderByStripeSessionId = async function(stripeSessionId: unknown){
+export const getOrderByStripeSessionId = async function(stripeSessionId: unknown): Promise<Order | Error | null >{
   try {
     const user = await getCurrentUser()
       
@@ -37,7 +37,7 @@ export const getOrderByStripeSessionId = async function(stripeSessionId: unknown
 }
 
 // Fetch order for storefront
-export const getStorefrontOrders = async function(searchParams: OrderSearchParams){
+export const getStorefrontOrders = async function(searchParams: OrderSearchParams): Promise<ResultItems<OrderWithItems>>{
   try {
     const user = await getCurrentUser()
 

@@ -9,7 +9,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useCart } from "@/store/CartContext";
 import { addProductToCart, removeProductFromCart } from "@/action/cart";
 import { cn, showNoti } from "@/lib/utils";
-import { CartItem } from "@/types";
+import { CartItem } from "@prisma/client";
 
 interface AddCartButtonProps {
   productId: string;

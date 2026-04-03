@@ -10,13 +10,13 @@ import { Trash2 } from "lucide-react"
 
 import Link from "next/link"
 import Image from "next/image"
-import { CartItem } from "@/types"
+import { CartItemWithProduct } from "@/types"
 import { formattedDateToRead, formattedPrice } from "@/lib/utils"
 import { removeProductFromCart } from "@/action/cart"
 import { useCart } from "@/store/CartContext"
 import { useState } from "react"
 
-export default function CartItemCard({ cartItem }: { cartItem: CartItem }) {
+export default function CartItemCard({ cartItem }: { cartItem: CartItemWithProduct }) {
   const { cartItems, removeCartItem } = useCart();
   const isInCart = cartItems.some(pc => pc.productId === cartItem.productId)
   

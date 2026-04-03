@@ -3,15 +3,15 @@
 import db from "@/lib/db";
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from "@/lib/utils";
 import { ProductCategoryFormData, productCategoryIdSchema, productCategorySchema, searchParamsSchema, validateFormData } from "@/lib/validations";
-import { ActionState, ProductCategory, ResultItems, SearchParams } from "@/types";
+import { ActionState, ProductCategoryOnlyIdAndTitle, ProductCategoryWithProducts, ResultItems, SearchParams } from "@/types";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isAdminUser } from "./user";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProductCategory } from "@prisma/client";
 
 // Fetch categories for admin
-export const getAdminCategories = async function(searchParams: SearchParams): Promise<ResultItems<ProductCategory>>{
+export const getAdminCategories = async function(searchParams: SearchParams): Promise<ResultItems<ProductCategoryWithProducts>>{
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
 
@@ -56,7 +56,7 @@ export const getAdminCategories = async function(searchParams: SearchParams): Pr
 }
 
 // Fetch categories for dropdown (select)
-export const getCategoriesForSelect = async function () {
+export const getCategoriesForSelect = async function (): Promise<ProductCategoryOnlyIdAndTitle[] | Error> {
   try {
     return await db.productCategory.findMany({
       select: {
@@ -71,7 +71,7 @@ export const getCategoriesForSelect = async function () {
 };
 
 // Fetch categories for storefront
-export const getStorefrontCategories = async () => { 
+export const getStorefrontCategories = async function(): Promise<ProductCategory[] | Error> { 
   try {
     return await db.productCategory.findMany({
       where: {

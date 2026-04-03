@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ProductFormData } from '@/lib/validations';
-import { ActionState, Product } from '@/types';
+import { Product } from '@prisma/client';
+import { ActionState } from '@/types';
 import { File } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import EmptyStorage from "../EmptyStorage";
-import { Product } from "@/types";
+import { ProductWithCategory } from "@/types";
 import { MoreHorizontalIcon, Package } from "lucide-react";
 import { LIMIT_RESULT } from "@/action/constants";
 import { formattedDateToRead, formattedPrice } from "@/lib/utils";
@@ -11,7 +11,7 @@ import ProductDelete from "./ProductDelete";
 import Link from "next/link";
 
 interface ProductTableProps {
-  products: Product[];
+  products: ProductWithCategory[];
   page?: number;
 }
 

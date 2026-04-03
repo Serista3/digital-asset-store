@@ -6,11 +6,11 @@ import { errorMessage } from "@/lib/utils"
 import { auth } from "@clerk/nextjs/server"
 import { getCurrentUser } from "./user"
 import { getProduct } from "./product"
-import { Cart } from "@/types"
 import { productIdSchema, validateFormData } from "@/lib/validations"
+import { CartWithItems } from "@/types"
 
 // Fetch Current User Cart
-export const getCurrentUserCart = async function(): Promise<Cart | Error | null>{
+export const getCurrentUserCart = async function(): Promise<CartWithItems | Error | null>{
   try {
     const user = await getCurrentUser()
 

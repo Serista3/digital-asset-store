@@ -1,4 +1,4 @@
-import { User } from '@/types';
+import { User } from '@prisma/client';
 
 import { UsersRound } from 'lucide-react';
 import EmptyStorage from '../EmptyStorage';

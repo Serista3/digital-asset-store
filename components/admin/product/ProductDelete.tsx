@@ -1,6 +1,6 @@
 'use client';
 
-import { Product } from '@/types';
+import { Product } from '@prisma/client';
 import { AlertDialogDestructive } from '../AlertDialogDestructive';
 import { deleteProduct } from '@/action/product';
 import { showNoti } from '@/lib/utils';

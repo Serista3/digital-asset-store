@@ -5,7 +5,8 @@ import SubmitButton from '@/components/form/SubmitButton';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ProductCategoryFormData } from '@/lib/validations';
-import { ActionState, ProductCategory } from '@/types';
+import { ActionState } from '@/types';
+import { ProductCategory } from '@prisma/client';
 import { useActionState } from 'react';
 
 interface CategoryFormProps {

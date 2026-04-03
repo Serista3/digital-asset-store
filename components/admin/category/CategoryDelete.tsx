@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductCategory } from '@/types';
+import { ProductCategory } from '@prisma/client';
 import { AlertDialogDestructive } from '../AlertDialogDestructive';
 import { deleteProductCategory } from '@/action/category';
 import { showNoti } from '@/lib/utils';

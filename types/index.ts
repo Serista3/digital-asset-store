@@ -1,5 +1,5 @@
 import z from 'zod';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 
 export type ErrorMesg = 'custom' | 'unknown';
 
@@ -14,6 +14,7 @@ export type ResultItems<T> =
   | {
       data: T[];
       totalPages: number;
+      totalItems?: number;
     }
   | Error;
 
@@ -37,95 +38,63 @@ export interface OrderSearchParams extends SearchParams {
   status?: OrderStatus;
 }
 
-export interface User {
-  id: string;
-  clerkId: string;
-  email: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-  orders?: Order[] | null;
-  cart?: Cart | null;
-  downloads?: DownloadVerification[] | null;
-}
+export type UserWithCartAndItems = Prisma.UserGetPayload<{
+  include: {
+    cart: {
+      include: {
+        items: true;
+      };
+    };
+  };
+}>;
 
-export interface Product {
-  id: string;
-  title: string;
-  description?: string | null;
-  priceInCents: number;
-  imageUrl: string;
-  fileUrl: string;
-  isAvailable: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  categoryId: string;
-  category?: ProductCategory;
-  cartItems?: CartItem[];
-  downloadVerifications?: DownloadVerification[];
-}
+export type OrderWithItems = Prisma.OrderGetPayload<{
+  include: {
+    items: true;
+  },
+}>;
 
-export interface ProductCategory {
-  id: string;
-  title: string;
-  createdAt: Date;
-  updatedAt: Date;
-  products?: Product[];
-}
+export type CartWithItems = Prisma.CartGetPayload<{
+  include: {
+    items: {
+      include: {
+        product: {
+          include: {
+            category: true
+          }
+        },
+      }
+    }
+  }
+}>;
 
-export interface Cart {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  items?: CartItem[];
-  userId: string;
-  user?: User;
-}
+export type CartItemWithProduct = Prisma.CartItemGetPayload<{
+  include: {
+    product: {
+      include: {
+        category: true;
+      }
+    }
+  }
+}>;
 
-export interface CartItem {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  cartId: string;
-  cart?: Cart;
-  productId: string;
-  product?: Product;
-}
+export type ProductCategoryWithProducts = Prisma.ProductCategoryGetPayload<{
+  include: {
+    products: {
+      where: { isArchived: false }
+    }
+  }
+}>
 
-export interface Order {
-  id: string;
-  status: OrderStatus;
-  totalPriceInCents: number;
-  stripeSessionId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  items?: OrderItem[];
-  userId: string;
-  user?: User;
-  downloadVerifications?: DownloadVerification[];
-}
+export type ProductCategoryOnlyIdAndTitle = Prisma.ProductCategoryGetPayload<{
+  select: {
+    id: true,
+    title: true,
+  },
+}>
 
-export interface OrderItem {
-  id: string;
-  title: string;
-  description?: string;
-  priceInCents: number;
-  imageUrl: string;
-  fileUrl: string;
-  createdAt: Date;
-  updatedAt: Date;
-  orderId: String;
-  order?: Order;
-}
-
-export interface DownloadVerification {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-  user?: User;
-  productId: string;
-  product?: Product;
-  orderId: string;
-  order?: Order;
-}
+export type ProductWithCategory = Prisma.ProductGetPayload<{
+  include: { 
+    category: true 
+  }
+}>

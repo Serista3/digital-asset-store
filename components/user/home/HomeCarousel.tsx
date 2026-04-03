@@ -6,7 +6,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import WideProductCard from '../products/WideProductCard';
-import { Product } from '@/types';
+import { Product } from '@prisma/client';
 
 interface HomeCarouselProps {
   products: Product[];

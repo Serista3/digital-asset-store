@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/lib/db';
-import { ActionState, Product, ProductSearchParams, ResultItems, SearchParams } from '@/types';
+import { ActionState, ProductSearchParams, ProductWithCategory, ResultItems, SearchParams } from '@/types';
 import { editProductSchema, ProductFormData, productIdSchema, productSchema, productSearchParamsSchema, searchParamsSchema, validateFormData } from '@/lib/validations';
 import { redirect } from 'next/navigation';
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from '@/lib/utils';
@@ -11,7 +11,7 @@ import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
 
 // Fetch products for storefront
-export const getStorefrontProducts = async function(searchParams: ProductSearchParams){
+export const getStorefrontProducts = async function(searchParams: ProductSearchParams): Promise<ResultItems<ProductWithCategory>> {
   try {
     const { skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
 
@@ -62,7 +62,7 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
 }
 
 // Fetch admin products
-export const getAdminProducts = async function (searchParams: SearchParams): Promise<ResultItems<Product>> {
+export const getAdminProducts = async function (searchParams: SearchParams): Promise<ResultItems<ProductWithCategory>> {
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
 
@@ -102,7 +102,7 @@ export const getAdminProducts = async function (searchParams: SearchParams): Pro
 };
 
 // Fetch product detail
-export const getProduct = async function (rawProductId: unknown): Promise<Product | null | Error> {
+export const getProduct = async function (rawProductId: unknown): Promise<ProductWithCategory | null | Error> {
   try {
     // Validation ID
     const validationId = validateFormData(productIdSchema, rawProductId)

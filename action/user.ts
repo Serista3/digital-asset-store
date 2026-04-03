@@ -3,8 +3,9 @@
 import db from '@/lib/db';
 import { calTotalPages, prepareBaseQueryInfo } from '@/lib/utils';
 import { searchParamsSchema, validateFormData } from '@/lib/validations';
-import { ResultItems, SearchParams, User } from '@/types';
+import { ResultItems, SearchParams, UserWithCartAndItems } from '@/types';
 import { auth } from '@clerk/nextjs/server';
+import { User } from '@prisma/client';
 
 // Admin role
 export const isAdminUser = async function(){
@@ -62,7 +63,7 @@ export const getUsers = async function (searchParams: SearchParams): Promise<Res
 };
 
 // Fetch Current User
-export const getCurrentUser = async function (): Promise<User | Error | null> {
+export const getCurrentUser = async function (): Promise<UserWithCartAndItems | Error | null> {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error('You are not login. Please login before view detail.');
