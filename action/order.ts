@@ -9,7 +9,7 @@ import { OrderSearchParams, OrderWithItems, ResultItems } from "@/types";
 import { revalidatePath } from "next/cache";
 
 // Fetch order by stripe session id
-export const getOrderByStripeSessionId = async function(stripeSessionId: unknown): Promise<Order | Error | null >{
+export const getOrderByStripeSessionId = async function(stripeSessionId: unknown): Promise<Order | Error | null>{
   try {
     const user = await getCurrentUser()
       
@@ -118,5 +118,39 @@ export const updateOrderStatusToCancelled = async function(rawOrderId: unknown){
   } catch (err) {
     console.error(err)
     return errorMessage('custom', err as Error)
+  }
+}
+
+// Fetch Order Detail
+export const getOrder = async function(rawOrderId: unknown): Promise<OrderWithItems | Error | null>{
+  try {
+    const user = await getCurrentUser()
+      
+    // If no user or not login
+    if(!user) throw new Error('User not found.');
+    if(user instanceof Error) throw user;
+
+    // Validation Id
+    const validation = validateFormData(orderIdSchema, rawOrderId)
+
+    if (!validation.success) throw new Error('Invalid order ID format')
+    if (!validation.data) throw new Error('Order id is required')
+    
+    const orderId = validation.data
+
+    // Query Order
+    const order = await db.order.findFirst({
+      where: {
+        id: orderId,
+        userId: user.id
+      },
+      include: {
+        items: true
+      }
+    })
+
+    return order
+  } catch (err) {
+    return err as Error
   }
 }
