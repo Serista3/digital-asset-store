@@ -6,9 +6,11 @@ import { redirect } from "next/navigation"
 import { getCurrentUser } from "./user"
 import { errorMessage } from "@/lib/utils"
 import { removeAllProductFromCart } from "./cart"
+import { orderIdSchema, validateFormData } from "@/lib/validations"
+import { OrderStatus } from "@prisma/client"
 
-// Create Checkout Session
-export const createCheckoutSession = async function(){
+// Create checkout session from cart
+export const createCheckoutSessionFromCart = async function(){
   let checkoutUrl: string | null = null;
 
   try {
@@ -98,6 +100,83 @@ export const createCheckoutSession = async function(){
 
     // Remove All Cart
     await removeAllProductFromCart()
+
+  } catch(err) {
+    console.error(err);
+    return errorMessage('custom', err as Error)
+  }
+
+  // Redirect url base on success checkout
+  if (checkoutUrl) {
+    redirect(checkoutUrl);
+  }
+}
+
+// Create checkout session from order
+export const createCheckoutSessionFromOrder = async function(rawOrderId: unknown){
+  let checkoutUrl: string | null = null;
+
+  try {
+    const user = await getCurrentUser()
+  
+    // If no user or not login
+    if(!user) throw new Error('User not found.');
+    if(user instanceof Error) throw user;
+
+    // Validation Id
+    const validation = validateFormData(orderIdSchema, rawOrderId)
+
+    if (!validation.success) throw new Error('Invalid order ID format')
+    if (!validation.data) throw new Error('Order id is required')
+    
+    const orderId = validation.data
+
+    // Query Order
+    const order = await db.order.findFirst({
+      where: { 
+        id: orderId,
+        userId: user.id,
+        status: OrderStatus.PENDING
+      }
+    });
+
+    if (!order) throw new Error("Order not found or cannot be paid");
+
+    // Create stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'thb',
+            product_data: {
+              name: `Order #${order.id.slice(0, 8)}`,
+            },
+            unit_amount: order.totalPriceInCents,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?sessionId={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/cancelled`,
+      metadata: {
+        orderId: order.id,
+      },
+    });
+
+    // Update strip session id
+    if (session.url) {
+      await db.order.update({
+        where: { 
+          id: order.id 
+        },
+        data: { 
+          stripeSessionId: session.id 
+        },
+      });
+      checkoutUrl = session.url;
+    }
 
   } catch(err) {
     console.error(err);

@@ -8,7 +8,7 @@ import { CreditCard } from "lucide-react";
 
 import { formattedPrice, showNoti } from "@/lib/utils";
 import { removeAllProductFromCart } from "@/action/cart";
-import { createCheckoutSession } from "@/action/checkout"; 
+import { createCheckoutSessionFromCart } from "@/action/checkout"; 
 import { useCart } from "@/store/CartContext";
 import { useState } from "react";
 
@@ -37,11 +37,11 @@ export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
     showNoti(result)
   }
 
-  // Operation: Checkout
+  // Handle checkout from cart
   const handleCheckout = async function(){
     setCheckoutLoading(true)
 
-    const result = await createCheckoutSession()
+    const result = await createCheckoutSessionFromCart()
 
     if(result) {
       showNoti(result)
@@ -68,13 +68,13 @@ export default function CartSummary({ amount, totalPrice }: CartSummaryProps){
             ? (
               <>
                 <Spinner />
-                <span>Paymenting...</span>
+                <span>Redirecting...</span>
               </>
             )
             : (
               <>
                 <CreditCard />
-                <span>Payment</span> 
+                <span>Pay Now</span> 
               </>
             )
           }

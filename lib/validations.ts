@@ -119,3 +119,6 @@ export const stripeSessionIdSchema = z.string().min(1, 'Stripe Session ID is req
 export const orderSearchParamsSchema = searchParamsSchema.extend({
   status: z.enum(OrderStatus).default(OrderStatus.PENDING),
 })
+
+// Order Id Schema
+export const orderIdSchema = z.string().min(1, 'Order ID is required');

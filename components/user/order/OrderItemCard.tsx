@@ -1,10 +1,10 @@
 'use client'
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
 import Paragraph from "@/components/typography/Paragraph";
+import PayOrderButton from "./PayOrderButton";
+import CancelOrderButton from "./CancelOrderButton";
 
 import { OrderStatus } from "@prisma/client";
 import { OrderWithItems } from "@/types";
@@ -30,7 +30,9 @@ export default function OrderItemCard({ status, order }: OrderItemCardProps) {
   const orderTotalPrice = formattedPrice(order.totalPriceInCents);
 
   return (
-    <Card className="w-full md:max-w-lg rounded-lg bg-white">
+    <Card className="w-full md:max-w-lg rounded-lg bg-white relative transition-all duration-300 hover:scale-101">
+      <Link href={`/orders/${order.id}`} className="absolute top-0 left-0 w-full h-full z-2" />
+
       <CardContent className="flex flex-col gap-1 flex-1">
         {/* Order Number & Status */}
         <div className="flex justify-between items-center gap-2">
@@ -53,7 +55,7 @@ export default function OrderItemCard({ status, order }: OrderItemCardProps) {
         </Paragraph>
 
         {/* Order Item List */}
-        <div className="mb-6">
+        <div className="mb-10">
           <div className="font-semibold mb-2">รายการ:</div>
           <ol className="list-decimal list-inside pl-4 space-y-1 text-gray-600">
             {orderItems.map(item => (
@@ -64,29 +66,17 @@ export default function OrderItemCard({ status, order }: OrderItemCardProps) {
         </div>
         
         {/* Total Price */}
-        <Paragraph className="font-semibold text-base mt-auto mb-3 flex gap-2 items-center flex-wrap">
+        <Paragraph className="font-semibold text-base mt-auto flex gap-2 items-center flex-wrap">
           Total Price:
           <span className="text-gray-600 font-normal">{orderTotalPrice}</span>
         </Paragraph>
 
         {/* Payment Btn & Cancel Order Btn */}
         {status === 'PENDING' && (
-          <div className="self-start flex items-center gap-2.5">
-            <Button>
-              <CreditCard />
-              Payment
-            </Button>
-            <Button variant='outline'>
-              Cancel Order
-            </Button>
+          <div className="self-start flex items-center gap-2.5 mt-3">
+            <PayOrderButton orderId={order.id} className="z-3" />
+            <CancelOrderButton orderId={order.id} className="z-3" />
           </div>
-        )}
-
-        {/* Order Detail Btn */}
-        {status !== 'PENDING' && (
-          <Button className="self-start" asChild>
-            <Link href={`/orders/${order.id}`}>Order Detail</Link>
-          </Button>
         )}
       </CardContent>
     </Card>
