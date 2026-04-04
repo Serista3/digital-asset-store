@@ -8,6 +8,7 @@ export interface ActionState<T> {
   message?: string;
   success?: boolean;
   oldFormData?: T;
+  data?: T;
 }
 
 export type ResultItems<T> =

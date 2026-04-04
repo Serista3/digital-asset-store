@@ -2,9 +2,8 @@ import Heading from "@/components/typography/Heading";
 import Paragraph from "@/components/typography/Paragraph";
 import PayOrderButton from "./PayOrderButton";
 import CancelOrderButton from "./CancelOrderButton";
-import { Button } from "@/components/ui/button";
+import ViewReceiptButton from "./ViewReceiptButton";
 import { Separator } from "@/components/ui/separator";
-import { ArrowDownToLine } from "lucide-react";
 
 import { OrderWithItems } from "@/types";
 import { formattedDateToRead, formattedPrice } from "@/lib/utils";
@@ -50,13 +49,8 @@ export default function OrderSummary({ order }: OrderSummaryProps){
         </div>
       </div>
       
-      {/* Download Receipt Btn */}
-      {status === 'PAID' && (
-        <Button className="mt-4">
-          <ArrowDownToLine />
-          Download Receipt
-        </Button>
-      )}
+      {/* View Receipt Btn */}
+      {status === 'PAID' && <ViewReceiptButton orderId={order.id} className="mt-4" />}
 
       {/* Payment Btn & Cancel Order Btn */}
       {status === 'PENDING' && (
