@@ -8,6 +8,7 @@ import { getCurrentUser } from "./user"
 import { getProduct } from "./product"
 import { productIdSchema, validateFormData } from "@/lib/validations"
 import { CartWithItems } from "@/types"
+import { hasPurchasedThisProduct } from "./order"
 
 // Fetch Current User Cart
 export const getCurrentUserCart = async function(): Promise<CartWithItems | Error | null>{
@@ -48,6 +49,12 @@ export const addProductToCart = async function(rawProductId: unknown){
   try {
     const { isAuthenticated } = await auth()
     if(!isAuthenticated) throw new Error('You are not Login. Please login before add product to cart.')
+
+    // Check if the product has already been purchased
+    const hasPurchased = await hasPurchasedThisProduct(rawProductId);
+
+    if (hasPurchased instanceof Error) throw hasPurchased;
+    if (hasPurchased === true) throw new Error('You already own this product. Please go to your downloads.')
 
     // Validation Id
     const validationId = validateFormData(productIdSchema, rawProductId)

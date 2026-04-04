@@ -222,3 +222,39 @@ export const getProductFileUrl = async function(rawOrderId: unknown, rawProductI
     return errorMessage('custom', err as Error)
   }
 }
+
+// Has purchased this product
+export const hasPurchasedThisProduct = async function(rawProductId: unknown): Promise<boolean | Error>{
+  try {
+    const user = await getCurrentUser()
+      
+    // If no user or not login
+    if(!user) throw new Error('User not found.');
+    if(user instanceof Error) throw user;
+
+    // Validation Product Id
+    const validationProductId = validateFormData(productIdSchema, rawProductId)
+
+    if (!validationProductId.success) throw new Error('Invalid product ID format')
+    if (!validationProductId.data) throw new Error('Product id is required')
+    
+    const productId = validationProductId.data
+
+    // Query Order
+    const existingOrder = await db.order.findFirst({
+      where: {
+        userId: user.id,
+        status: OrderStatus.PAID,
+        items: {
+          some: { 
+            productId 
+          }
+        }
+      }
+    });
+
+    return !!existingOrder;
+  } catch (err) {
+    return err as Error
+  }
+}

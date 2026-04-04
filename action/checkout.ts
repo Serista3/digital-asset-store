@@ -10,6 +10,7 @@ import { removeAllProductFromCart } from "./cart"
 import { orderIdSchema, validateFormData } from "@/lib/validations"
 import { OrderStatus } from "@prisma/client"
 import { ActionState } from "@/types"
+import { hasPurchasedThisProduct } from "./order"
 
 // Create checkout session from cart
 export const createCheckoutSessionFromCart = async function(){
@@ -24,6 +25,14 @@ export const createCheckoutSessionFromCart = async function(){
 
     // User Cart Exists
     if(!user.cart || !user.cart.items || user.cart.items.length === 0) throw new Error('Your cart is empty')
+    
+    // Check if the product has already been purchased
+    for (const item of user.cart.items) {
+      const hasPurchased = await hasPurchasedThisProduct(item.productId);
+
+      if (hasPurchased instanceof Error) throw hasPurchased;
+      if (hasPurchased === true) throw new Error('You already own this product. Please go to your downloads.')
+    }
     
     const productIds = user.cart.items.map(item => item.productId);
 
@@ -139,10 +148,21 @@ export const createCheckoutSessionFromOrder = async function(rawOrderId: unknown
         id: orderId,
         userId: user.id,
         status: OrderStatus.PENDING
+      },
+      include: {
+        items: true
       }
     });
 
     if (!order) throw new Error("Order not found or cannot be paid");
+
+    // Check if the product has already been purchased
+    for (const item of order.items) {
+      const hasPurchased = await hasPurchasedThisProduct(item.productId);
+
+      if (hasPurchased instanceof Error) throw hasPurchased;
+      if (hasPurchased === true) throw new Error('You already own this product. Please go to your downloads.')
+    }
 
     // Create stripe checkout session
     const session = await stripe.checkout.sessions.create({
