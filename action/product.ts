@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/lib/db';
-import { ActionState, ProductSearchParams, ProductWithCategory, ProductWithVerifications, ResultItems, SearchParams } from '@/types';
+import { ActionState, ProductSearchParams, ProductWithCategory, ProductWithCategoryAndStatus, ResultItems, SearchParams } from '@/types';
 import { editProductSchema, ProductFormData, productIdSchema, productSchema, productSearchParamsSchema, searchParamsSchema, validateFormData } from '@/lib/validations';
 import { redirect } from 'next/navigation';
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from '@/lib/utils';
@@ -9,9 +9,10 @@ import { isAdminUser } from './user';
 import { deleteProductDigitalFile, deleteProductImage, uploadProductDigitalFile, uploadProductImage } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
+import { hasPurchasedThisProduct } from './order';
 
 // Fetch products for storefront
-export const getStorefrontProducts = async function(searchParams: ProductSearchParams): Promise<ResultItems<ProductWithVerifications>> {
+export const getStorefrontProducts = async function(searchParams: ProductSearchParams): Promise<ResultItems<ProductWithCategoryAndStatus>> {
   try {
     const { skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
 
@@ -50,15 +51,27 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
         orderBy: orderByCondition,
         include: { 
           category: true,
-          downloadVerifications: true
         }
       }),
 
       db.product.count({ where: whereConditional }),
     ]);
 
+    // If product has already been purchased
+    const productsWithStatus: ProductWithCategoryAndStatus[] = await Promise.all(
+      products.map(async (p) => {
+        const isPurchased = await hasPurchasedThisProduct(p.id);
+        if (isPurchased instanceof Error) throw isPurchased;
+
+        return {
+          ...p,
+          isPurchased,
+        };
+      })
+    );
+
     const totalPages = calTotalPages(totalItems);
-    return { data: products, totalPages, totalItems };
+    return { data: productsWithStatus, totalPages, totalItems };
   } catch (err) {
     return err as Error;
   }
@@ -105,7 +118,7 @@ export const getAdminProducts = async function (searchParams: SearchParams): Pro
 };
 
 // Fetch product detail
-export const getProduct = async function (rawProductId: unknown): Promise<ProductWithVerifications | null | Error> {
+export const getProduct = async function (rawProductId: unknown): Promise<ProductWithCategory | null | Error> {
   try {
     // Validation ID
     const validationId = validateFormData(productIdSchema, rawProductId)
@@ -122,7 +135,6 @@ export const getProduct = async function (rawProductId: unknown): Promise<Produc
       },
       include: {
         category: true,
-        downloadVerifications: true
       }
     });
 

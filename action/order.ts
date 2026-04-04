@@ -213,8 +213,8 @@ export const hasPurchasedThisProduct = async function(rawProductId: unknown): Pr
     const user = await getCurrentUser()
       
     // If no user or not login
-    if(!user) throw new Error('User not found.');
-    if(user instanceof Error) throw user;
+    if(!user) return false;
+    if(user instanceof Error) return false;
 
     // Validation Product Id
     const validationProductId = validateFormData(productIdSchema, rawProductId)

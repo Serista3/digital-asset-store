@@ -11,6 +11,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getProduct, getStorefrontProducts } from '@/action/product';
 import { formattedDateToRead, formattedPrice } from '@/lib/utils';
+import { hasPurchasedThisProduct } from '@/action/order';
 
 export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -27,7 +28,12 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
     return <AlertDestructive error={product} />
   }
 
-  const isPurchased = product.downloadVerifications.some(v => v.productId === product.id)
+  // If product has already been purchased
+  const isPurchased = await hasPurchasedThisProduct(product.id)
+
+  if(isPurchased instanceof Error){
+    return <AlertDestructive error={isPurchased} />
+  }
 
   // Other Products
   const productList = await getStorefrontProducts({ category: product.category?.title })

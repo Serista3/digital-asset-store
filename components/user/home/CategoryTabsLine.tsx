@@ -7,7 +7,7 @@ import Paragraph from '@/components/typography/Paragraph';
 
 import { getStorefrontProducts } from '@/action/product';
 import { ProductCategory } from '@prisma/client';
-import { ProductWithCategory } from '@/types';
+import { ProductWithCategoryAndStatus } from '@/types';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -23,7 +23,7 @@ export default function CategoryTabsLine({
 }: CategoryTabsLineProps) {
   const firstCategory = categories[0]?.title;
   const finalCategory = category ?? firstCategory
-  const [products, setProducts] = useState<ProductWithCategory[]>([]);
+  const [products, setProducts] = useState<ProductWithCategoryAndStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter()
 
