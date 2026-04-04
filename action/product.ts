@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/lib/db';
-import { ActionState, ProductSearchParams, ProductWithCategory, ResultItems, SearchParams } from '@/types';
+import { ActionState, ProductSearchParams, ProductWithCategory, ProductWithVerifications, ResultItems, SearchParams } from '@/types';
 import { editProductSchema, ProductFormData, productIdSchema, productSchema, productSearchParamsSchema, searchParamsSchema, validateFormData } from '@/lib/validations';
 import { redirect } from 'next/navigation';
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from '@/lib/utils';
@@ -11,7 +11,7 @@ import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
 
 // Fetch products for storefront
-export const getStorefrontProducts = async function(searchParams: ProductSearchParams): Promise<ResultItems<ProductWithCategory>> {
+export const getStorefrontProducts = async function(searchParams: ProductSearchParams): Promise<ResultItems<ProductWithVerifications>> {
   try {
     const { skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
 
@@ -48,7 +48,10 @@ export const getStorefrontProducts = async function(searchParams: ProductSearchP
         skip,
         take: limit,
         orderBy: orderByCondition,
-        include: { category: true }
+        include: { 
+          category: true,
+          downloadVerifications: true
+        }
       }),
 
       db.product.count({ where: whereConditional }),
@@ -102,7 +105,7 @@ export const getAdminProducts = async function (searchParams: SearchParams): Pro
 };
 
 // Fetch product detail
-export const getProduct = async function (rawProductId: unknown): Promise<ProductWithCategory | null | Error> {
+export const getProduct = async function (rawProductId: unknown): Promise<ProductWithVerifications | null | Error> {
   try {
     // Validation ID
     const validationId = validateFormData(productIdSchema, rawProductId)
@@ -118,7 +121,8 @@ export const getProduct = async function (rawProductId: unknown): Promise<Produc
         id,
       },
       include: {
-        category: true
+        category: true,
+        downloadVerifications: true
       }
     });
 

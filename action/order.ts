@@ -181,38 +181,22 @@ export const getProductFileUrl = async function(rawOrderId: unknown, rawProductI
     
     const productId = validationProductId.data
 
-    // Query Order
-    const order = await db.order.findFirst({
+    // Query Download Verification
+    const verification = await db.downloadVerification.findFirst({
       where: {
-        id: orderId,
         userId: user.id,
-        status: OrderStatus.PAID
+        productId: productId,
+        orderId: orderId
       },
       include: {
-        items: true
+        product: { select: { fileUrl: true } }
       }
     });
 
-    if (!order) throw new Error("Order not found or not paid");
-
-    // Has product in order
-    const hasItem = order.items.some(item => item.productId === productId);
-    if (!hasItem) throw new Error("Product not found in this order");
-
-    // Query product only file url
-    const product = await db.product.findUnique({
-      where: { 
-        id: productId 
-      },
-      select: { 
-        fileUrl: true
-      }
-    });
-
-    if (!product?.fileUrl) throw new Error("Product file path not found");
-
+    if (!verification) throw new Error("You don't have permission to download this file, or your payment hasn't been completed successfully.");
+    
     // Create Signed URL
-    const result = await createSignedUrlForProductFile(product)
+    const result = await createSignedUrlForProductFile(verification.product)
 
     if (result instanceof Error) throw result;
 
@@ -240,20 +224,15 @@ export const hasPurchasedThisProduct = async function(rawProductId: unknown): Pr
     
     const productId = validationProductId.data
 
-    // Query Order
-    const existingOrder = await db.order.findFirst({
+    // Query Download Verification
+    const existingVerification = await db.downloadVerification.findFirst({
       where: {
         userId: user.id,
-        status: OrderStatus.PAID,
-        items: {
-          some: { 
-            productId 
-          }
-        }
+        productId: productId
       }
     });
 
-    return !!existingOrder;
+    return !!existingVerification;
   } catch (err) {
     return err as Error
   }

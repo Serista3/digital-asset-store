@@ -42,33 +42,35 @@ export async function POST(req: NextRequest) {
 
         if (!order) throw new Error("Order not found");
 
-        // Update status order to PAID
-        await db.order.update({
-          where: { 
-            id: order.id 
-          },
-          data: { 
-            status: 'PAID',
-          },
-        });
-
-        // Create DownloadVerifications
-        const validItems = order.items.filter(item => item.productId !== null);
-
-        if (validItems.length > 0) {
-          // Map Structure Data
-          const downloadVerificationsData = validItems.map((item) => ({
-            userId: order.userId,
-            productId: item.productId as string,
-            orderId: order.id,
-          }));
-
-          // Save data in DB
-          await db.downloadVerification.createMany({
-            data: downloadVerificationsData,
+        await db.$transaction(async (prisma) => {
+          // Update status order to PAID
+          await prisma.order.update({
+            where: { 
+              id: order.id 
+            },
+            data: { 
+              status: 'PAID',
+            },
           });
-        }
 
+          // Create DownloadVerifications
+          const validItems = order.items.filter(item => item.productId !== null);
+
+          if (validItems.length > 0) {
+            // Map Structure Data
+            const downloadVerificationsData = validItems.map((item) => ({
+              userId: order.userId,
+              productId: item.productId as string,
+              orderId: order.id,
+            }));
+
+            // Save data in DB
+            await prisma.downloadVerification.createMany({
+              data: downloadVerificationsData,
+            });
+          }
+        })
+        
         console.log(`✅ ชำระเงินสำเร็จ! อัปเดตออเดอร์ ${order.id} เรียบร้อยแล้ว`);
       } catch (error) {
         console.error("❌ อัปเดตออเดอร์ไม่สำเร็จ:", error);

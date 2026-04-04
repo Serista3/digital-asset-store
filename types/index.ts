@@ -99,3 +99,10 @@ export type ProductWithCategory = Prisma.ProductGetPayload<{
     category: true 
   }
 }>
+
+export type ProductWithVerifications = Prisma.ProductGetPayload<{
+  include: { 
+    category: true,
+    downloadVerifications: true
+  }
+}>

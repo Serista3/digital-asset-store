@@ -5,15 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 
 import { formattedPrice } from '@/lib/utils';
-import { ProductWithCategory } from '@/types';
+import { ProductWithVerifications } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface ProductCardProps {
-  product: ProductWithCategory;
+  product: ProductWithVerifications;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const isPurchased = product.downloadVerifications.some(v => v.productId === product.id)
+
   return (
     <Card className="relative w-full max-w-125 pt-0 overflow-hidden hover:scale-101 transition-all duration-300">
       <Link href={`/products/${product.id}`} className='absolute top-0 left-0 size-full z-2' />
@@ -35,8 +37,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardHeader>
       <CardFooter className='mt-auto relative z-3'>
-        {product.isAvailable && <AddCartButton productId={product.id} />}
-        {!product.isAvailable && <Button disabled>Not Available</Button>}
+        {isPurchased ? (
+          <Button disabled className="w-full">Purchased</Button>
+        ) : !product.isAvailable ? (
+          <Button disabled className="w-full">Not Available</Button>
+        ) : (
+          <AddCartButton productId={product.id} />
+        )}
       </CardFooter>
     </Card>
   );

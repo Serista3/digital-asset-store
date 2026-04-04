@@ -27,6 +27,8 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
     return <AlertDestructive error={product} />
   }
 
+  const isPurchased = product.downloadVerifications.some(v => v.productId === product.id)
+
   // Other Products
   const productList = await getStorefrontProducts({ category: product.category?.title })
   const isProductList = !(productList instanceof Error)
@@ -84,11 +86,14 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
           {/* Product Description */}
           <Paragraph className='mb-6 sm:mb-auto text-gray-600'>{product.description}</Paragraph>
 
-          {/* Add Cart Btn */}
-          {product.isAvailable && <AddCartButton className='w-fit' productId={product.id} />}
-
-          {/* Not Available Btn */}
-          {!product.isAvailable && <Button disabled className='w-fit'>Not Available</Button>}
+          {/* Action Button */}
+          {isPurchased ? (
+            <Button disabled className="w-fit">Purchased</Button>
+          ) : !product.isAvailable ? (
+            <Button disabled className='w-fit'>Not Available</Button>
+          ) : (
+            <AddCartButton className='w-fit' productId={product.id} />
+          )}
         </div>
       </div>
 
