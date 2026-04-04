@@ -1,6 +1,6 @@
 import Heading from "@/components/typography/Heading"
 import Paragraph from "@/components/typography/Paragraph"
-import { Button } from "@/components/ui/button"
+import DownloadProductFileButton from "./DownloadProductFileButton"
 import { Card, CardContent } from "@/components/ui/card"
 
 import Link from "next/link"
@@ -45,11 +45,13 @@ export default function OrderProductItemCard({ orderItem, orderStatus }: OrderPr
             <span className="font-normal">{formattedPrice(orderItem.priceInCents)}</span>
           </Paragraph>
 
-          {/* Download File Btn */}
+          {/* Download Product File Btn */}
           {orderStatus === 'PAID' && (
-            <Button className="self-start mt-2 z-3">
-              Download File
-            </Button>
+            <DownloadProductFileButton 
+              orderId={orderItem.orderId} 
+              productId={orderItem.productId} 
+              className="self-start mt-2 z-3" 
+            />
           )}
         </div>
       </CardContent>

@@ -4,9 +4,10 @@ import db from "@/lib/db"
 import { Prisma, Order, OrderStatus } from "@prisma/client";
 import { getCurrentUser } from "./user";
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from "@/lib/utils";
-import { orderIdSchema, orderSearchParamsSchema, stripeSessionIdSchema, validateFormData } from "@/lib/validations";
-import { OrderSearchParams, OrderWithItems, ResultItems } from "@/types";
+import { orderIdSchema, orderSearchParamsSchema, productIdSchema, stripeSessionIdSchema, validateFormData } from "@/lib/validations";
+import { ActionState, OrderSearchParams, OrderWithItems, ResultItems } from "@/types";
 import { revalidatePath } from "next/cache";
+import { createSignedUrlForProductFile } from "@/lib/supabase";
 
 // Fetch order by stripe session id
 export const getOrderByStripeSessionId = async function(stripeSessionId: unknown): Promise<Order | Error | null>{
@@ -152,5 +153,72 @@ export const getOrder = async function(rawOrderId: unknown): Promise<OrderWithIt
     return order
   } catch (err) {
     return err as Error
+  }
+}
+
+// Fetch product file url
+export const getProductFileUrl = async function(rawOrderId: unknown, rawProductId: unknown): Promise<ActionState<string>>{
+  try {
+    const user = await getCurrentUser()
+      
+    // If no user or not login
+    if(!user) throw new Error('User not found.');
+    if(user instanceof Error) throw user;
+
+    // Validation Order Id
+    const validationOrderId = validateFormData(orderIdSchema, rawOrderId)
+
+    if (!validationOrderId.success) throw new Error('Invalid order ID format')
+    if (!validationOrderId.data) throw new Error('Order id is required')
+    
+    const orderId = validationOrderId.data
+
+    // Validation Product Id
+    const validationProductId = validateFormData(productIdSchema, rawProductId)
+
+    if (!validationProductId.success) throw new Error('Invalid product ID format')
+    if (!validationProductId.data) throw new Error('Product id is required')
+    
+    const productId = validationProductId.data
+
+    // Query Order
+    const order = await db.order.findFirst({
+      where: {
+        id: orderId,
+        userId: user.id,
+        status: OrderStatus.PAID
+      },
+      include: {
+        items: true
+      }
+    });
+
+    if (!order) throw new Error("Order not found or not paid");
+
+    // Has product in order
+    const hasItem = order.items.some(item => item.productId === productId);
+    if (!hasItem) throw new Error("Product not found in this order");
+
+    // Query product only file url
+    const product = await db.product.findUnique({
+      where: { 
+        id: productId 
+      },
+      select: { 
+        fileUrl: true
+      }
+    });
+
+    if (!product?.fileUrl) throw new Error("Product file path not found");
+
+    // Create Signed URL
+    const result = await createSignedUrlForProductFile(product)
+
+    if (result instanceof Error) throw result;
+
+    return { success: true, message: 'Your download will begin shortly.', data: result.signedUrl };
+  } catch (err) {
+    console.error(err)
+    return errorMessage('custom', err as Error)
   }
 }

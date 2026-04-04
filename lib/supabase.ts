@@ -1,4 +1,5 @@
 import { isAdminUser } from '@/action/user'
+import { Product } from '@prisma/client'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -96,5 +97,20 @@ export const deleteProductDigitalFile = async function(fileUrl: string) {
     return true;
   } catch (error) {
     throw new Error('เกิดข้อผิดพลาดในการลบไฟล์');
+  }
+}
+
+// Create signed url for product file
+export const createSignedUrlForProductFile = async function(product: { fileUrl: string }) {
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(digitalFileBucket)
+      .createSignedUrl(product.fileUrl, 60)
+
+    if (error) throw new Error('Failed to create signed URL');
+
+    return data;
+  } catch (error) {
+    return error as Error
   }
 }
