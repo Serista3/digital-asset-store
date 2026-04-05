@@ -4,16 +4,18 @@ import ExplorerLayout from '@/components/layout/ExplorerLayout';
 import AlertDestructive from '@/components/admin/AlertDestructive';
 import { ArrowUpDown, Box, Component, UserRound } from 'lucide-react';
 
-import { getUsers } from '@/action/user';
-import { getAdminOrders } from '@/action/order';
-import { getAdminProducts } from '@/action/product';
-import { getAdminCategories } from '@/action/category';
+import { getUserCount } from '@/action/user';
+import { getOrderCount } from '@/action/order';
+import { getProductCount } from '@/action/product';
+import { getProductCategoryCount } from '@/action/category';
 
 export default async function Dashboard() {
-  const products = await getAdminProducts({});
-  const categories = await getAdminCategories({});
-  const users = await getUsers({});
-  const orders = await getAdminOrders({ status: 'PAID' });
+  const [productsCount, categoriesCount, usersCount, ordersCount] = await Promise.all([
+    getProductCount(),
+    getProductCategoryCount(),
+    getUserCount(),
+    getOrderCount('PAID')
+  ]);
 
   return (
     <ExplorerLayout title="Dashboard">
@@ -21,50 +23,50 @@ export default async function Dashboard() {
         <Heading level='2'>All Times</Heading>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {/* Product Stats */}
-          {products instanceof Error ? (
-            <AlertDestructive error={products} />
+          {productsCount instanceof Error ? (
+            <AlertDestructive error={productsCount} />
           ) : (
             <DashboardStats
               path="/admin/products"
               icon={<Box className="size-16" strokeWidth={0.5} />}
               title="product"
-              description={`${products.totalItems} ${products.totalItems === 1 ? 'item' : 'items'}`}
+              description={`${productsCount} ${productsCount === 1 ? 'item' : 'items'}`}
             />
           )}
 
           {/* Product Category Stats */}
-          {categories instanceof Error ? (
-            <AlertDestructive error={categories} />
+          {categoriesCount instanceof Error ? (
+            <AlertDestructive error={categoriesCount} />
           ) : (
             <DashboardStats
               path="/admin/product-categories"
               icon={<Component className="size-16" strokeWidth={0.5} />}
               title="category"
-              description={`${categories.totalItems} ${categories.totalItems === 1 ? 'item' : 'items'}`}
+              description={`${categoriesCount} ${categoriesCount === 1 ? 'item' : 'items'}`}
             />
           )}
 
           {/* User Stats */}
-          {users instanceof Error ? (
-            <AlertDestructive error={users} />
+          {usersCount instanceof Error ? (
+            <AlertDestructive error={usersCount} />
           ) : (
             <DashboardStats
               path="/admin/users"
               icon={<UserRound className="size-16" strokeWidth={0.5} />}
               title="user"
-              description={`${users.totalItems} ${users.totalItems === 1 ? 'item' : 'items'}`}
+              description={`${usersCount} ${usersCount === 1 ? 'item' : 'items'}`}
             />
           )}
 
           {/* Order Stats */}
-          {orders instanceof Error ? (
-            <AlertDestructive error={orders} />
+          {ordersCount instanceof Error ? (
+            <AlertDestructive error={ordersCount} />
           ) : (
             <DashboardStats
               path="/admin/orders"
               icon={<ArrowUpDown className="size-16" strokeWidth={0.5} />}
               title="order"
-              description={`${orders.totalItems} ${orders.totalItems === 1 ? 'item' : 'items'}`}
+              description={`${ordersCount} ${ordersCount === 1 ? 'item' : 'items'}`}
             />
           )}
         </div>

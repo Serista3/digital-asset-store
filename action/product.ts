@@ -350,3 +350,15 @@ export const deleteProduct = async function(rawProductId: unknown){
     return errorMessage('custom', err as Error)
   }
 }
+
+// Fetch Product Count
+export const getProductCount = async function(): Promise<number | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+    
+    return await db.product.count();
+
+  } catch (err){
+    return err as Error;
+  }
+}

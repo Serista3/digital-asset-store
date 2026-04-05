@@ -117,8 +117,24 @@ export const stripeSessionIdSchema = z.string().min(1, 'Stripe Session ID is req
 
 // Order Search Params Schema
 export const orderSearchParamsSchema = searchParamsSchema.extend({
-  status: z.enum(OrderStatus).default(OrderStatus.PENDING),
+  status: z.enum(OrderStatus).catch(OrderStatus.PENDING),
 })
 
 // Order Id Schema
 export const orderIdSchema = z.string().min(1, 'Order ID is required');
+
+// Order Status Schema
+export const orderStatusSchema = z.enum(OrderStatus).optional();
+
+// Month Schema
+export const monthSchema = z.object({
+  month: z.coerce.number().int().min(1).max(12).optional(),
+})
+
+// Year Schema
+export const yearSchema = z.object({
+  year: z.coerce.number().int().min(2000).max(new Date().getFullYear() + 5).optional()
+})
+
+// Month & Year Schema
+export const monthAndYearSchema = monthSchema.extend(yearSchema.shape)

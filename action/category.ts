@@ -231,3 +231,15 @@ export const deleteProductCategory = async function (rawCategoryId: unknown) {
     return errorMessage('custom', err as Error)
   }
 };
+
+// Fetch Product Category Count
+export const getProductCategoryCount = async function(): Promise<number | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+    
+    return await db.productCategory.count();
+
+  } catch (err){
+    return err as Error;
+  }
+}

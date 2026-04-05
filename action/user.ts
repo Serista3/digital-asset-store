@@ -87,3 +87,15 @@ export const getCurrentUser = async function (): Promise<UserWithCartAndItems | 
     return err as Error;
   }
 };
+
+// Fetch User Count
+export const getUserCount = async function(): Promise<number | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+    
+    return await db.user.count();
+
+  } catch (err){
+    return err as Error;
+  }
+}

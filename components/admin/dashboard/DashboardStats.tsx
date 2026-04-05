@@ -22,7 +22,7 @@ export default function DashboardStats({
   return (
     <div
       className={cn(
-        'border border-gray-700 rounded-lg px-10 py-6 flex flex-col gap-4 items-center relative transition-all duration-300 hover:scale-101',
+        'border border-gray-700 rounded-lg px-10 py-6 flex flex-col gap-4 justify-center items-center relative transition-all duration-300 hover:scale-101',
         className,
       )}
     >
