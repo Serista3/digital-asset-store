@@ -63,3 +63,28 @@ export const formattedPrice = function(price: number){
     maximumFractionDigits: 2
   }) + " THB"
 }
+
+// Calculate Date Range
+export const getDateRange = function(month?: number, year?: number){
+  let startDate: Date | undefined = undefined;
+  let endDate: Date | undefined = undefined;
+
+  if (year && month) {
+    startDate = new Date(year, month - 1, 1);
+    endDate = new Date(year, month, 1);
+  }
+
+  else if (year) {
+    startDate = new Date(year, 0, 1);
+    endDate = new Date(year + 1, 0, 1);
+  }
+
+  else if (month) {
+    const curYear = new Date().getFullYear()
+
+    startDate = new Date(curYear, month - 1, 1);
+    endDate = new Date(curYear, month, 1);
+  }
+
+  return { startDate, endDate }
+}

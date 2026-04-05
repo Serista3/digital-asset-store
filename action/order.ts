@@ -3,11 +3,12 @@
 import db from "@/lib/db"
 import { Prisma, Order, OrderStatus } from "@prisma/client";
 import { getCurrentUser, isAdminUser } from "./user";
-import { calTotalPages, errorMessage, prepareBaseQueryInfo } from "@/lib/utils";
-import { orderIdSchema, orderSearchParamsSchema, productIdSchema, stripeSessionIdSchema, validateFormData } from "@/lib/validations";
-import { ActionState, OrderSearchParams, OrderWithItems, OrderWithItemsAndUser, ResultItems } from "@/types";
+import { calTotalPages, errorMessage, getDateRange, prepareBaseQueryInfo } from "@/lib/utils";
+import { monthAndYearSchema, orderIdSchema, orderSearchParamsSchema, orderStatusSchema, productIdSchema, stripeSessionIdSchema, validateFormData, yearSchema } from "@/lib/validations";
+import { ActionState, OrderSearchParams, OrderWithItems, OrderWithItemsAndUser, ResultItems, RevenueByCategory, YearlyRevenue } from "@/types";
 import { revalidatePath } from "next/cache";
 import { createSignedUrlForProductFile } from "@/lib/supabase";
+import { MONTHS } from "./constants";
 
 // Fetch order by stripe session id
 export const getOrderByStripeSessionId = async function(stripeSessionId: unknown): Promise<Order | Error | null>{
@@ -286,5 +287,172 @@ export const getAdminOrders = async function(searchParams: OrderSearchParams): P
     return { data: orders, totalPages, totalItems };
   } catch (err) {
     return err as Error;
+  }
+}
+
+// Fetch Order Count
+export const getOrderCount = async function(rawStatus?: unknown): Promise<number | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation Status
+    const validationStatus = validateFormData(orderStatusSchema, rawStatus)
+
+    if (!validationStatus.success) throw new Error('Invalid order status format')
+    
+    const status = validationStatus.data
+    
+    // Query Order Count
+    return await db.order.count({ 
+      where: status ? { status } : undefined
+    });
+
+  } catch (err){
+    return err as Error;
+  }
+}
+
+// Fetch total revenue by month and year
+export const getTotalRevenueByMonthAndYear = async function(rawMonth?: unknown, rawYear?: unknown): Promise<number | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation Month And Year
+    const validation = validateFormData(monthAndYearSchema, { month: rawMonth, year: rawYear })
+
+    if (!validation.success || !validation.data) throw new Error('Invalid month or year format')
+
+    const { year, month } = validation.data
+
+    // Retieve Date
+    const { startDate, endDate } = getDateRange(month, year);
+
+    // Query Total Revenue
+    const totalRevenue = await db.order.aggregate({
+      _sum: {
+        totalPriceInCents: true
+      },
+      where: {
+        status: OrderStatus.PAID,
+        ...(startDate || endDate ? {
+          updatedAt: {
+            gte: startDate,
+            lt: endDate,
+          }
+        } : {})
+      }
+    })
+
+    // Calculate Final Total Revenue
+    const finalTotalRevenue = totalRevenue._sum.totalPriceInCents || 0;
+
+    return finalTotalRevenue;
+  } catch (err){
+    return err as Error;
+  }
+}
+
+// Fetch Yearly Revenue
+export const getYearlyRevenue = async function(rawYear: unknown): Promise<YearlyRevenue[] | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+    
+    // Validation Year
+    const validation = validateFormData(yearSchema, { year: rawYear })
+
+    if (!validation.success || !validation.data) throw new Error('Invalid year format')
+
+    const { year } = validation.data
+    
+    // Map month with revenues
+    const monthWithRevenues = MONTHS.map(async (monthName, index) => {
+      const monthNumber = index + 1;
+      const revenueInCents = await getTotalRevenueByMonthAndYear(monthNumber, year);
+
+      if(revenueInCents instanceof Error) throw revenueInCents;
+      
+      const finalRevenue = revenueInCents / 100;
+
+      return {
+        month: monthName,
+        revenue: finalRevenue
+      };
+    });
+
+    const yearlyRevenue = await Promise.all(monthWithRevenues);
+
+    return yearlyRevenue;
+  } catch (err) {
+    return err as Error
+  }
+}
+
+// Fetch Revenue By Category
+export const getRevenueByCategory = async function(rawMonth?: unknown, rawYear?: unknown): Promise<RevenueByCategory[] | Error>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation Month And Year
+    const validation = validateFormData(monthAndYearSchema, { month: rawMonth, year: rawYear })
+
+    if (!validation.success || !validation.data) throw new Error('Invalid month or year format')
+
+    const { year, month } = validation.data
+
+    // Retieve Date
+    const { startDate, endDate } = getDateRange(month, year);
+
+    // Query Category
+    const categories = await db.productCategory.findMany({
+      select: {
+        title: true,
+        products: {
+          select: {
+            orderItems: {
+              where: {
+                order: {
+                  status: OrderStatus.PAID,
+                  ...(startDate || endDate ? {
+                    updatedAt: {
+                      gte: startDate,
+                      lt: endDate,
+                    }
+                  } : {})
+                },
+              },
+              select: {
+                priceInCents: true,
+              }
+            }
+          }
+        }
+      }
+    })
+
+    // Formatted revenue by category data
+    const revenueByCategory = categories.map(category => {
+
+      // Calculate total revenue all product in one category
+      const totalRevenueInCents = category.products.reduce((accProduct, product) => {
+
+        // Calculate one product revenue
+        const productRevenue = product.orderItems.reduce((accItem, item) => {
+          return accItem + item.priceInCents
+        }, 0)
+
+        return accProduct + productRevenue
+      }, 0)
+
+      return {
+        title: category.title,
+        value: totalRevenueInCents / 100
+      }
+    })
+
+    const finalData = revenueByCategory.filter(item => item.value > 0);
+
+    return finalData;
+  } catch (err){
+    return err as Error
   }
 }

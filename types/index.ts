@@ -114,3 +114,13 @@ export type ProductWithCategoryAndStatus = Prisma.ProductGetPayload<{
 }> & {
   isPurchased: boolean;
 }
+
+export type YearlyRevenue = {
+  month: string;
+  revenue: number;
+}
+
+export type RevenueByCategory = {
+  title: string;
+  value: number;
+}
