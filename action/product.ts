@@ -111,7 +111,7 @@ export const getAdminProducts = async function (searchParams: SearchParams): Pro
     ]);
 
     const totalPages = calTotalPages(totalItems);
-    return { data: products, totalPages };
+    return { data: products, totalPages, totalItems };
   } catch (err) {
     return err as Error;
   }

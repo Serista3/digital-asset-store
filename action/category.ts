@@ -49,7 +49,7 @@ export const getAdminCategories = async function(searchParams: SearchParams): Pr
     ]);
 
     const totalPages = calTotalPages(totalItems);
-    return { data, totalPages };
+    return { data, totalPages, totalItems };
   } catch (err) {
     return err as Error;
   }

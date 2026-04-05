@@ -283,7 +283,7 @@ export const getAdminOrders = async function(searchParams: OrderSearchParams): P
     ]);
 
     const totalPages = calTotalPages(totalItems);
-    return { data: orders, totalPages };
+    return { data: orders, totalPages, totalItems };
   } catch (err) {
     return err as Error;
   }

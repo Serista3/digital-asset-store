@@ -56,6 +56,7 @@ export const getUsers = async function (searchParams: SearchParams): Promise<Res
     return {
       data: users,
       totalPages,
+      totalItems: totalUsers
     };
   } catch (err) {
     return err as Error;
