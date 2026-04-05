@@ -2,10 +2,10 @@
 
 import db from "@/lib/db"
 import { Prisma, Order, OrderStatus } from "@prisma/client";
-import { getCurrentUser } from "./user";
+import { getCurrentUser, isAdminUser } from "./user";
 import { calTotalPages, errorMessage, prepareBaseQueryInfo } from "@/lib/utils";
 import { orderIdSchema, orderSearchParamsSchema, productIdSchema, stripeSessionIdSchema, validateFormData } from "@/lib/validations";
-import { ActionState, OrderSearchParams, OrderWithItems, ResultItems } from "@/types";
+import { ActionState, OrderSearchParams, OrderWithItems, OrderWithItemsAndUser, ResultItems } from "@/types";
 import { revalidatePath } from "next/cache";
 import { createSignedUrlForProductFile } from "@/lib/supabase";
 
@@ -235,5 +235,56 @@ export const hasPurchasedThisProduct = async function(rawProductId: unknown): Pr
     return !!existingVerification;
   } catch (err) {
     return err as Error
+  }
+}
+
+// Fetch Admin Orders
+export const getAdminOrders = async function(searchParams: OrderSearchParams): Promise<ResultItems<OrderWithItemsAndUser>>{
+  try {
+    if(!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    const { searchTerm: rawSearchTerm, skip: rawSkip, limit: rawLimit } = prepareBaseQueryInfo(searchParams)
+
+    // Validation Search Params
+    const validation = validateFormData(orderSearchParamsSchema, { 
+      status: searchParams.status, 
+      searchTerm: rawSearchTerm, 
+      skip: rawSkip, 
+      limit: rawLimit
+    })
+    if (!validation.success || !validation.data) throw new Error('Invalid search parameters')
+    
+    const { status, searchTerm, skip, limit } = validation.data
+
+    const whereConditional: Prisma.OrderWhereInput = {
+      id: {
+        contains: searchTerm,
+        mode: 'insensitive',
+      },
+      status,
+    }
+    
+    // Query Order
+    const [orders, totalItems] = await db.$transaction([
+      db.order.findMany({
+        where: whereConditional,
+        skip,
+        take: limit,
+        orderBy: { 
+          updatedAt: 'desc' 
+        },
+        include: { 
+          items: true,
+          user: true
+        }
+      }),
+
+      db.order.count({ where: whereConditional })
+    ]);
+
+    const totalPages = calTotalPages(totalItems);
+    return { data: orders, totalPages };
+  } catch (err) {
+    return err as Error;
   }
 }

@@ -55,6 +55,13 @@ export type OrderWithItems = Prisma.OrderGetPayload<{
   },
 }>;
 
+export type OrderWithItemsAndUser = Prisma.OrderGetPayload<{
+  include: {
+    items: true;
+    user: true;
+  },
+}>;
+
 export type CartWithItems = Prisma.CartGetPayload<{
   include: {
     items: {
