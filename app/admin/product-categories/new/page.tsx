@@ -10,6 +10,11 @@ import {
 } from '@/components/ui/breadcrumb';
 import { createProductCategory } from '@/action/category';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Create Product Category',
+};
 
 export default function newProductCategory() {
   return (

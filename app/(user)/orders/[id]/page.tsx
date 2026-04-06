@@ -7,6 +7,11 @@ import OrderSummary from "@/components/user/order/OrderSummary";
 import { Badge } from "@/components/ui/badge";
 
 import { getOrder } from "@/action/order";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Order Detail',
+};
 
 const statusClasses = {
   'PENDING': 'border-yellow-500 text-yellow-500',

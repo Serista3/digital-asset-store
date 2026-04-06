@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { getUsers } from '@/action/user';
 import { SearchParams } from '@/types';
 
@@ -6,6 +7,10 @@ import BasicPagination from '@/components/admin/BasicPagination';
 import UserSearch from '@/components/admin/user/UserSearch';
 import UserTable from '@/components/admin/user/UserTable';
 import ExplorerLayout from '@/components/layout/ExplorerLayout';
+
+export const metadata: Metadata = {
+  title: 'Users',
+};
 
 interface UsersProps {
   searchParams: Promise<SearchParams>;

@@ -9,6 +9,11 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { getAdminProducts } from '@/action/product';
 import { SearchParams } from '@/types';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Products',
+};
 
 interface ProductsProps {
   searchParams: Promise<SearchParams>;

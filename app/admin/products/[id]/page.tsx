@@ -13,6 +13,11 @@ import AlertDestructive from '@/components/admin/AlertDestructive';
 import Link from 'next/link';
 import { getCategoriesForSelect } from '@/action/category';
 import { getProduct, updateProduct } from '@/action/product';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Edit Product',
+};
 
 export default async function EditProduct({
   params,

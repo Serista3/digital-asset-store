@@ -9,6 +9,11 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { getAdminCategories } from '@/action/category';
 import { SearchParams } from '@/types';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Product Categories',
+};
 
 interface ProductCategoriesProps {
   searchParams: Promise<SearchParams>;

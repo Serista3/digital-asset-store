@@ -1,5 +1,10 @@
 import StatusCard from '@/components/common/StatusCard';
 import Paragraph from '@/components/typography/Paragraph';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Payment Cancelled',
+};
 
 export default function PaymentCancelled() {
   return (

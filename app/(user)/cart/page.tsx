@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Metadata } from "next";
 import { getCurrentUserCart } from "@/action/cart";
 
 import Heading from "@/components/typography/Heading";
@@ -7,6 +8,10 @@ import AlertDestructive from "@/components/admin/AlertDestructive";
 import CartItemCard from "@/components/user/cart/CartItemCard";
 import CartSummary from "@/components/user/cart/CartSummary";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: 'Cart',
+};
 
 export default async function Cart() {
   const curUserCart = await getCurrentUserCart();

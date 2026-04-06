@@ -4,6 +4,11 @@ import BasicPagination from '@/components/admin/BasicPagination';
 
 import { OrderSearchParams } from '@/types';
 import { getStorefrontOrders } from '@/action/order';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Orders',
+};
 
 export default async function Orders({ searchParams }: { searchParams: Promise<OrderSearchParams> }) {
   const { status } = await searchParams;

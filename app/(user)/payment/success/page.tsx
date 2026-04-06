@@ -5,6 +5,11 @@ import { formattedDateToRead } from '@/lib/utils';
 import StatusCard from '@/components/common/StatusCard';
 import Paragraph from '@/components/typography/Paragraph';
 import AlertDestructive from '@/components/admin/AlertDestructive';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Payment Success',
+};
 
 interface PaymentSuccessProps {
   searchParams: Promise<{

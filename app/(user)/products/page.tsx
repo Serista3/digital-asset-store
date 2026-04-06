@@ -1,6 +1,7 @@
 import { getStorefrontCategories } from '@/action/category';
 import { getStorefrontProducts } from '@/action/product';
 import { ProductSearchParams } from '@/types';
+import { Metadata } from 'next';
 
 import AlertDestructive from '@/components/admin/AlertDestructive';
 import ExplorerLayout from '@/components/layout/ExplorerLayout';
@@ -9,6 +10,10 @@ import Paragraph from '@/components/typography/Paragraph';
 import ProductCard from '@/components/user/products/ProductCard';
 import BasicPagination from '@/components/admin/BasicPagination';
 import Heading from '@/components/typography/Heading';
+
+export const metadata: Metadata = {
+  title: 'Products',
+};
 
 export default async function Products({ searchParams }: { searchParams: Promise<ProductSearchParams>; }) {
   const params = await searchParams;

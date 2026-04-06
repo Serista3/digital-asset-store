@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { getAdminOrders } from '@/action/order';
 import { OrderSearchParams } from '@/types';
 
@@ -7,6 +8,10 @@ import OrderSearch from '@/components/admin/order/OrderSearch';
 import OrderStatusSelect from '@/components/admin/order/OrderStatusSelect';
 import OrderTable from '@/components/admin/order/OrderTable';
 import BasicPagination from '@/components/admin/BasicPagination';
+
+export const metadata: Metadata = {
+  title: 'Orders',
+};
 
 interface OrdersProps {
   searchParams: Promise<OrderSearchParams>;

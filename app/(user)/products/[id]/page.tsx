@@ -12,6 +12,11 @@ import Image from 'next/image';
 import { getProduct, getStorefrontProducts } from '@/action/product';
 import { formattedDateToRead, formattedPrice } from '@/lib/utils';
 import { hasPurchasedThisProduct } from '@/action/order';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Product Detail',
+};
 
 export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
