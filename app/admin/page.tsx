@@ -81,7 +81,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
             <AlertDestructive error={totalRevenue} />
           ) : (
             <DashboardStats
-              path="/admin/orders"
+              path="/admin/orders?status=PAID"
               icon={<CircleDollarSign className="size-16" strokeWidth={0.5} />}
               title="Total Revenue"
               description={formattedPrice(totalRevenue)}
@@ -136,7 +136,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
             <AlertDestructive error={ordersCount} />
           ) : (
             <DashboardStats
-              path="/admin/orders"
+              path="/admin/orders?status=PAID"
               icon={<ArrowUpDown className="size-16" strokeWidth={0.5} />}
               title="order"
               description={`${ordersCount} ${ordersCount === 1 ? 'order' : 'orders'}`}
