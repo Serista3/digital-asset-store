@@ -1,6 +1,7 @@
 'use server'
 
 import db from "@/lib/db"
+import { Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { errorMessage } from "@/lib/utils"
 import { auth } from "@clerk/nextjs/server"
@@ -76,7 +77,7 @@ export const addProductToCart = async function(rawProductId: unknown){
     if(product instanceof Error) throw product;
     if(!product.isAvailable) throw new Error('This product is currently unavailable and cannot be added to your cart.');
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       // If user doesn't have cart then create new
       const cart = await tx.cart.upsert({
         where: { 

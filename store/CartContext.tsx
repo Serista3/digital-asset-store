@@ -1,7 +1,7 @@
 'use client';
 
+import { CartItem } from '@prisma/client';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { CartItem } from '@/types';
 
 interface CartContextType {
   cartItems: CartItem[];
