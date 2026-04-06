@@ -1,5 +1,5 @@
 # Digital Asset Store
-![Project Banner](https://github.com/user-attachments/assets/98bb7ae2-6805-4514-97da-bf3bc7641d51)
+![Project Banner](https://github.com/user-attachments/assets/5c3932e6-86d8-4611-8980-4f8ea0eba7dc)
 > **Web Application สำหรับซื้อขายสินค้าดิจิทัล** ช่วยให้คุณเข้าถึงสินค้าดิจิทัลที่ต้องการไม่ว่าจะเป็น E-Book, Source Code หรืออื่นๆ ได้อย่างสะดวกรวดเร็ว
 
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
@@ -32,10 +32,8 @@
 - Manage Product Category (CRUD)
 - View orders & users
 
----
-
 ## Database Design (ER Diagram)
-<img width="1413" height="1011" alt="Untitled" src="https://github.com/user-attachments/assets/48f16097-b1a1-442a-b254-f5891227f2ec" />
+<img width="1413" height="1011" alt="Untitled" src="https://github.com/user-attachments/assets/55e2e75d-95ad-4b52-86a0-5c0c94c78c21" />
 
 > Designed by Thanapat Malikaew based on real world.
 
