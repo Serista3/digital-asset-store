@@ -133,7 +133,7 @@ export const monthSchema = z.object({
 
 // Year Schema
 export const yearSchema = z.object({
-  year: z.coerce.number().int().min(2000).max(new Date().getFullYear() + 5).optional()
+  year: z.coerce.number().int().min(2000).max(new Date().getFullYear() + 5).default(new Date().getFullYear())
 })
 
 // Month & Year Schema

@@ -31,7 +31,7 @@ export default function DashboardStats({
       <Heading level="3" className="capitalize">
         {title}
       </Heading>
-      <Paragraph className="text-gray-400 text-base">{description}</Paragraph>
+      <Paragraph className="opacity-70 text-base">{description}</Paragraph>
     </div>
   );
 }

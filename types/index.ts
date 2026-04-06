@@ -116,7 +116,12 @@ export type ProductWithCategoryAndStatus = Prisma.ProductGetPayload<{
 }
 
 export type YearlyRevenue = {
-  month: string;
+  label: string;
+  revenue: number;
+}
+
+export type DailyRevenue = {
+  label: string;
   revenue: number;
 }
 

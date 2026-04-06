@@ -2,34 +2,79 @@ import Heading from '@/components/typography/Heading';
 import DashboardStats from '@/components/admin/dashboard/DashboardStats';
 import ExplorerLayout from '@/components/layout/ExplorerLayout';
 import AlertDestructive from '@/components/admin/AlertDestructive';
+import FilterMonthAndYear from '@/components/admin/dashboard/FilterMonthAndYear';
+import RevenueBarChart from '@/components/admin/dashboard/RevenueBarChart';
 import CategoryDonutChart from '@/components/admin/dashboard/CategoryDonutChart';
-import MonthlyRevenueChart from '@/components/admin/dashboard/MonthlyRevenueChart';
 import { ArrowUpDown, Box, CircleDollarSign, Component, UserRound } from 'lucide-react';
 
 import { getUserCount } from '@/action/user';
 import { getProductCount } from '@/action/product';
 import { getProductCategoryCount } from '@/action/category';
-import { getOrderCount, getTotalRevenueByMonthAndYear } from '@/action/order';
+import { getDailyRevenue, getOrderCount, getRevenueByCategory, getTotalRevenueByMonthAndYear, getYearlyRevenue } from '@/action/order';
 import { formattedPrice } from '@/lib/utils';
 
-export default async function Dashboard() {
+interface DashboardProps {
+  searchParams: Promise<{
+    month?: string;
+    year?: string;
+  }>;
+}
+
+export default async function Dashboard({ searchParams }: DashboardProps) {
+  const { month, year } = await searchParams;
+
+  // Fetch Stats Data
   const [totalRevenue, productsCount, categoriesCount, usersCount, ordersCount] = await Promise.all([
-    getTotalRevenueByMonthAndYear(),
+    getTotalRevenueByMonthAndYear(month, year),
     getProductCount(),
     getProductCategoryCount(),
     getUserCount(),
     getOrderCount('PAID')
   ]);
 
+  // Calculate Bar Chart Data
+  let barChartData;
+  let labelType = 'Month';
+  
+  if(month){
+    barChartData = await getDailyRevenue(month, year)
+    labelType = 'Date'
+  }else {
+    barChartData = await getYearlyRevenue(year)
+  }
+
+  // Fetch Revenue By Category
+  const donutChartData = await getRevenueByCategory(month, year);
+
   return (
-    <ExplorerLayout title="Dashboard">
+    <ExplorerLayout title="" className='relative'>
+      {/* Filter */}
+      <FilterMonthAndYear month={month} year={year} className='absolute top-0 right-0' />
+
       <div className='grid grid-cols-1 gap-8'>
-        {/* Monthy Revenue Chart */}
-        <MonthlyRevenueChart />
+        {/* Revenue Chart */}
+        {barChartData instanceof Error ? (
+          <AlertDestructive error={barChartData} />
+        ) : (
+          <RevenueBarChart 
+            data={barChartData} 
+            labelType={labelType} 
+            title='Revenue Overview' 
+            description='Summary of your earnings over time.' 
+          />
+        )}
 
         <div className='grid grid-cols-2 gap-8'>
-          {/* Category Donut Chart */}
-          <CategoryDonutChart />
+          {/* Category Chart */}
+          {donutChartData instanceof Error ? (
+            <AlertDestructive error={donutChartData} />
+          ) : (
+            <CategoryDonutChart 
+              data={donutChartData.slice(0, 7)}
+              title='Revenue Category' 
+              description='Distribution of total earnings across different categories.' 
+            />
+          )}
 
           {/* Total Revenue Stats */}
           {totalRevenue instanceof Error ? (
@@ -40,14 +85,15 @@ export default async function Dashboard() {
               icon={<CircleDollarSign className="size-16" strokeWidth={0.5} />}
               title="Total Revenue"
               description={formattedPrice(totalRevenue)}
+              className='text-emerald-400'
             />
           )}
         </div>
       </div>
 
-      {/* All Times */}
-      <section className='flex flex-col gap-12'>
-        <Heading level='2'>All Times</Heading>
+      {/* Overview */}
+      <section className='flex flex-col gap-12 mt-10'>
+        <Heading level='2'>Overview</Heading>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {/* Product Stats */}
           {productsCount instanceof Error ? (
@@ -81,7 +127,7 @@ export default async function Dashboard() {
               path="/admin/users"
               icon={<UserRound className="size-16" strokeWidth={0.5} />}
               title="user"
-              description={`${usersCount} ${usersCount === 1 ? 'item' : 'items'}`}
+              description={`${usersCount} ${usersCount === 1 ? 'user' : 'users'}`}
             />
           )}
 
@@ -93,7 +139,7 @@ export default async function Dashboard() {
               path="/admin/orders"
               icon={<ArrowUpDown className="size-16" strokeWidth={0.5} />}
               title="order"
-              description={`${ordersCount} ${ordersCount === 1 ? 'item' : 'items'}`}
+              description={`${ordersCount} ${ordersCount === 1 ? 'order' : 'orders'}`}
             />
           )}
         </div>

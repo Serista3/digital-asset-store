@@ -5,7 +5,7 @@ import { Prisma, Order, OrderStatus } from "@prisma/client";
 import { getCurrentUser, isAdminUser } from "./user";
 import { calTotalPages, errorMessage, getDateRange, prepareBaseQueryInfo } from "@/lib/utils";
 import { monthAndYearSchema, orderIdSchema, orderSearchParamsSchema, orderStatusSchema, productIdSchema, stripeSessionIdSchema, validateFormData, yearSchema } from "@/lib/validations";
-import { ActionState, OrderSearchParams, OrderWithItems, OrderWithItemsAndUser, ResultItems, RevenueByCategory, YearlyRevenue } from "@/types";
+import { ActionState, DailyRevenue, OrderSearchParams, OrderWithItems, OrderWithItemsAndUser, ResultItems, RevenueByCategory, YearlyRevenue } from "@/types";
 import { revalidatePath } from "next/cache";
 import { createSignedUrlForProductFile } from "@/lib/supabase";
 import { MONTHS } from "./constants";
@@ -353,7 +353,7 @@ export const getTotalRevenueByMonthAndYear = async function(rawMonth?: unknown, 
 }
 
 // Fetch Yearly Revenue
-export const getYearlyRevenue = async function(rawYear: unknown): Promise<YearlyRevenue[] | Error>{
+export const getYearlyRevenue = async function(rawYear?: unknown): Promise<YearlyRevenue[] | Error>{
   try {
     if(!await isAdminUser()) throw new Error('You are not Admin!!')
     
@@ -374,7 +374,7 @@ export const getYearlyRevenue = async function(rawYear: unknown): Promise<Yearly
       const finalRevenue = revenueInCents / 100;
 
       return {
-        month: monthName,
+        label: monthName,
         revenue: finalRevenue
       };
     });
@@ -384,6 +384,58 @@ export const getYearlyRevenue = async function(rawYear: unknown): Promise<Yearly
     return yearlyRevenue;
   } catch (err) {
     return err as Error
+  }
+}
+
+// Fetch Daily Revenue
+export const getDailyRevenue = async function(rawMonth?: unknown, rawYear?: unknown): Promise<DailyRevenue[] | Error>{
+  try {
+    if (!await isAdminUser()) throw new Error('You are not Admin!!')
+
+    // Validation Month And Year
+    const validation = validateFormData(monthAndYearSchema, { month: rawMonth, year: rawYear })
+
+    if (!validation.success || !validation.data) throw new Error('Invalid month or year format')
+      
+    const { year, month } = validation.data
+    const safeMonth = month || new Date().getMonth() + 1;
+
+    // Retieve Date
+    const { startDate, endDate } = getDateRange(safeMonth, year);
+
+    // 2. Query Order
+    const orders = await db.order.findMany({
+      where: {
+        status: OrderStatus.PAID,
+        ...(startDate || endDate ? {
+          updatedAt: {
+            gte: startDate,
+            lt: endDate,
+          }
+        } : {})
+      },
+      select: {
+        totalPriceInCents: true,
+        updatedAt: true
+      }
+    });
+
+    const daysInMonth = new Date(year, safeMonth, 0).getDate();
+
+    const dailyData = Array.from({ length: daysInMonth }, (_, i) => ({
+      label: (i + 1).toString(),
+      revenue: 0
+    }));
+
+    // Formatted Daily Data
+    orders.forEach(order => {
+      const day = order.updatedAt.getDate();
+      dailyData[day - 1].revenue += (order.totalPriceInCents / 100);
+    });
+
+    return dailyData;
+  } catch (err) {
+    return err as Error;
   }
 }
 
