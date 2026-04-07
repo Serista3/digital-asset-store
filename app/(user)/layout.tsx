@@ -17,6 +17,28 @@ export const metadata: Metadata = {
     default: 'DigiDrop | Your Digital Marketplace',
   },
   description: 'Discover and download high-quality digital products, UI kits, templates, and more at DigiDrop.',
+  keywords: [
+    // English Keywords
+    'digital products',
+    'digital marketplace',
+    'UI kits',
+    'website templates',
+    'design assets',
+    'Figma templates',
+    'digital downloads',
+    'web development resources',
+    'UI components',
+    'graphics',
+    
+    // Thai Keywords
+    'สินค้าดิจิทัล',
+    'ตลาดซื้อขายสินค้าดิจิทัล',
+    'เทมเพลตเว็บไซต์',
+    'เครื่องมือออกแบบ',
+    'ดาวน์โหลดเทมเพลต',
+    'กราฟิกดีไซน์',
+    'เว็บสำเร็จรูป'
+  ],
   openGraph: {
     title: 'DigiDrop | Your Digital Marketplace',
     description: 'Discover and download high-quality digital products, UI kits, templates, and more at DigiDrop.',
